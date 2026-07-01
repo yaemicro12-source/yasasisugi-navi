@@ -75,16 +75,16 @@ p {
 
 .clock-panel {
   display: grid;
-  gap: 2px;
-  margin: 8px 0 18px;
+  gap: 6px;
+  margin: 4px 0 20px;
 }
 
 .current-time {
   display: block;
   color: var(--blue-strong);
-  font-size: clamp(4.2rem, 20vw, 8.5rem);
+  font-size: clamp(8.4rem, 44vw, 24rem);
   font-weight: 900;
-  line-height: 0.92;
+  line-height: 0.82;
   letter-spacing: 0;
 }
 
