@@ -11,9 +11,15 @@
     <section class="home" aria-labelledby="home-title">
       <div class="home__content">
         <p class="app-label">Yasashisug Navi</p>
+
+        <div class="clock-panel" aria-label="現在時刻と次の目安">
+          <time id="current-time" class="current-time">--:--</time>
+          <p id="next-reminder" class="next-reminder">最初の予定の5分前 --:--</p>
+        </div>
+
         <div class="navigator">
-          <div class="speech" role="status">
-            <p>今日はどこに行く？一緒に確認しよう。</p>
+          <div class="speech" role="status" aria-live="polite">
+            <p id="navigator-message">今日はどこに行く？一緒に確認しよう。</p>
           </div>
           <div class="character-slot" aria-label="ナビゲーターキャラクター仮表示">
             <div class="character-placeholder">
@@ -23,17 +29,16 @@
         </div>
 
         <h1 id="home-title">やさしく出発を整えるナビ</h1>
-        <p class="home__lead">目的地、時間、出発の目安を少ない手順で確認できます。</p>
 
         <div class="main-actions" aria-label="メインメニュー">
           <button type="button" class="action-button" data-scroll-target="goal-section">
-            ゴールの設定
+            行き先をきめる
+          </button>
+          <button type="button" class="action-button" data-scroll-target="schedule-section">
+            よてい
           </button>
           <button type="button" class="action-button action-button--light" id="lost-button">
             迷った
-          </button>
-          <button type="button" class="action-button" data-scroll-target="check-section">
-            何時に出るか確認する
           </button>
         </div>
 
@@ -46,9 +51,9 @@
 
     <section id="goal-section" class="section-panel" aria-labelledby="goal-title">
       <div class="section-heading">
-        <p class="eyebrow">Step 1</p>
-        <h2 id="goal-title">ゴールの設定</h2>
-        <p>まずは目的地と、何時に着きたいかを入れます。</p>
+        <p class="eyebrow">行き先</p>
+        <h2 id="goal-title">行き先をきめる</h2>
+        <p>目的地と、何時に着きたいかを入れます。</p>
       </div>
 
       <div class="form form--goal">
@@ -71,9 +76,9 @@
 
     <section id="check-section" class="section-panel planner" aria-labelledby="planner-title">
       <div class="section-heading">
-        <p class="eyebrow">Step 2</p>
-        <h2 id="planner-title">何時に出るか確認する</h2>
-        <p>移動と準備にかかる時間を入れると、出発と起床の目安を出します。</p>
+        <p class="eyebrow">逆算</p>
+        <h2 id="planner-title">時間を調整する</h2>
+        <p>移動と準備にかかる時間を入れると、下の予定が更新されます。</p>
       </div>
 
       <form id="navi-form" class="form">
@@ -104,36 +109,23 @@
       </form>
     </section>
 
-    <section class="section-panel result" aria-live="polite" aria-labelledby="result-title">
+    <section id="schedule-section" class="section-panel schedule" aria-live="polite" aria-labelledby="schedule-title">
       <div class="section-heading">
-        <p class="eyebrow">Result</p>
-        <h2 id="result-title">大事な時間</h2>
+        <p class="eyebrow">よてい</p>
+        <h2 id="schedule-title">今日のタイムライン</h2>
+        <p id="summary">入力すると、ここに今日の流れが表示されます。</p>
       </div>
 
-      <div class="result-grid">
-        <article class="result-card result-card--primary">
-          <p>起きる時間</p>
-          <strong id="wake-time">--:--</strong>
-          <span>ここから準備を始めると間に合いやすいです。</span>
-        </article>
-        <article class="result-card result-card--primary">
-          <p>家を出る時間</p>
-          <strong id="leave-time">--:--</strong>
-          <span>この時間になったら出発の合図です。</span>
-        </article>
-        <article class="result-card">
-          <p>到着目標</p>
-          <strong id="target-arrival-time">--:--</strong>
-          <span>予定より少し早めに着く目安です。</span>
-        </article>
-        <article class="result-card">
-          <p>移動時間</p>
-          <strong id="travel-time">--分</strong>
-          <span>距離と歩く速さから計算しています。</span>
-        </article>
-      </div>
+      <div id="timeline" class="timeline"></div>
 
-      <div id="summary" class="summary"></div>
+      <div class="achievement" aria-labelledby="achievement-title">
+        <div class="achievement__header">
+          <h3 id="achievement-title">今日の達成度</h3>
+          <strong id="achievement-percent">0%</strong>
+        </div>
+        <div id="achievement-blocks" class="achievement__blocks" aria-hidden="true"></div>
+        <p id="achievement-count" class="achievement__count">0 / 5 完了</p>
+      </div>
     </section>
   </main>
 
