@@ -7,49 +7,54 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="hero">
-    <div class="hero__inner">
-      <p class="eyebrow">ADHD傾向・方向音痴・移動不安に寄りそうナビ</p>
-      <h1>Yasashisug Navi</h1>
-      <p class="lead">
-        予定時刻から逆算して、起きる時間と家を出る時間をやさしく整理します。
-        急かしすぎず、でも必要な時間ははっきり伝えるためのMVPです。
-      </p>
-    </div>
-  </header>
+  <main>
+    <section class="home" aria-labelledby="home-title">
+      <div class="home__content">
+        <p class="app-label">Yasashisug Navi</p>
+        <div class="navigator">
+          <div class="speech" role="status">
+            <p>今日はどこに行く？一緒に確認しよう。</p>
+          </div>
+          <div class="character-slot" aria-label="ナビゲーターキャラクター仮表示">
+            <div class="character-placeholder">
+              <span>ここに<br>キャラ</span>
+            </div>
+          </div>
+        </div>
 
-  <main class="page">
-    <section class="intro" aria-labelledby="concept-title">
-      <h2 id="concept-title">このアプリが助けること</h2>
-      <div class="feature-grid">
-        <article>
-          <h3>逆算が苦手でも大丈夫</h3>
-          <p>予定時刻から、到着したい時間・家を出る時間・起きる時間を順番に計算します。</p>
-        </article>
-        <article>
-          <h3>歩く速さに合わせる</h3>
-          <p>移動距離と歩行速度から、あなたのペースに近い移動時間を出します。</p>
-        </article>
-        <article>
-          <h3>迷いやすさも見込む</h3>
-          <p>予備時間を含めて計算するので、初めての場所でも少し余裕を作れます。</p>
-        </article>
+        <h1 id="home-title">やさしく出発を整えるナビ</h1>
+        <p class="home__lead">目的地、時間、出発の目安を少ない手順で確認できます。</p>
+
+        <div class="main-actions" aria-label="メインメニュー">
+          <button type="button" class="action-button" data-scroll-target="goal-section">
+            ゴールの設定
+          </button>
+          <button type="button" class="action-button action-button--light" id="lost-button">
+            迷った
+          </button>
+          <button type="button" class="action-button" data-scroll-target="check-section">
+            何時に出るか確認する
+          </button>
+        </div>
+
+        <div id="lost-guide" class="lost-guide" hidden>
+          <h2>迷ったときのサポート</h2>
+          <p>見えるものや写真から現在地を確認する機能は今後追加予定です。今は、近くの目印や駅名をゆっくり確認してみましょう。</p>
+        </div>
       </div>
     </section>
 
-    <section class="planner" aria-labelledby="planner-title">
-      <div class="planner__header">
-        <div>
-          <p class="eyebrow">今日の移動プラン</p>
-          <h2 id="planner-title">必要な時間をいっしょに逆算</h2>
-        </div>
-        <p class="planner__note">入力したら自動で計算します。わからない項目はあとで調整できます。</p>
+    <section id="goal-section" class="section-panel" aria-labelledby="goal-title">
+      <div class="section-heading">
+        <p class="eyebrow">Step 1</p>
+        <h2 id="goal-title">ゴールの設定</h2>
+        <p>まずは目的地と、何時に着きたいかを入れます。</p>
       </div>
 
-      <form id="navi-form" class="form">
+      <div class="form form--goal">
         <label class="field field--wide">
           <span>目的地</span>
-          <input id="destination" type="text" value="はじめて行く場所" placeholder="例: クリニック、駅、面接会場">
+          <input id="destination" type="text" value="はじめて行く場所" placeholder="例: クリニック、駅、待ち合わせ場所">
         </label>
 
         <label class="field">
@@ -58,17 +63,27 @@
         </label>
 
         <label class="field">
-          <span>何分前に着きたいか</span>
+          <span>何分前に着きたい？</span>
           <input id="arrival-buffer" type="number" min="0" step="1" value="10">
         </label>
+      </div>
+    </section>
 
+    <section id="check-section" class="section-panel planner" aria-labelledby="planner-title">
+      <div class="section-heading">
+        <p class="eyebrow">Step 2</p>
+        <h2 id="planner-title">何時に出るか確認する</h2>
+        <p>移動と準備にかかる時間を入れると、出発と起床の目安を出します。</p>
+      </div>
+
+      <form id="navi-form" class="form">
         <label class="field">
           <span>移動距離（km）</span>
           <input id="distance" type="number" min="0" step="0.1" value="1.5">
         </label>
 
         <label class="field">
-          <span>歩行速度（km/h）</span>
+          <span>歩く速さ（km/h）</span>
           <input id="walking-speed" type="number" min="0.1" step="0.1" value="4.0">
         </label>
 
@@ -82,24 +97,24 @@
           <input id="breakfast-time" type="number" min="0" step="1" value="20">
         </label>
 
-        <label class="field">
+        <label class="field field--wide">
           <span>迷った時の予備時間（分）</span>
           <input id="extra-time" type="number" min="0" step="1" value="15">
         </label>
       </form>
     </section>
 
-    <section class="result" aria-live="polite" aria-labelledby="result-title">
-      <div class="result__header">
-        <p class="eyebrow">計算結果</p>
-        <h2 id="result-title">この時間を目安にすると安心です</h2>
+    <section class="section-panel result" aria-live="polite" aria-labelledby="result-title">
+      <div class="section-heading">
+        <p class="eyebrow">Result</p>
+        <h2 id="result-title">大事な時間</h2>
       </div>
 
       <div class="result-grid">
         <article class="result-card result-card--primary">
           <p>起きる時間</p>
           <strong id="wake-time">--:--</strong>
-          <span>ここから準備を始めれば間に合いやすいです。</span>
+          <span>ここから準備を始めると間に合いやすいです。</span>
         </article>
         <article class="result-card result-card--primary">
           <p>家を出る時間</p>
@@ -107,28 +122,18 @@
           <span>この時間になったら出発の合図です。</span>
         </article>
         <article class="result-card">
-          <p>到着したい時間</p>
+          <p>到着目標</p>
           <strong id="target-arrival-time">--:--</strong>
-          <span>予定開始より少し前に着く設定です。</span>
+          <span>予定より少し早めに着く目安です。</span>
         </article>
         <article class="result-card">
-          <p>移動時間の目安</p>
+          <p>移動時間</p>
           <strong id="travel-time">--分</strong>
-          <span>歩く速さと距離から計算しています。</span>
+          <span>距離と歩く速さから計算しています。</span>
         </article>
       </div>
 
       <div id="summary" class="summary"></div>
-    </section>
-
-    <section class="future" aria-labelledby="future-title">
-      <h2 id="future-title">これから追加したいこと</h2>
-      <ul>
-        <li>ルートから外れたら、責めずにやさしく通知する</li>
-        <li>迷ったら、写真や見えるものから現在地確認を助ける</li>
-        <li>GPSや地図と連携して、今いる場所をわかりやすく表示する</li>
-        <li>出発前の小さなリマインダーを段階的に出す</li>
-      </ul>
     </section>
   </main>
 

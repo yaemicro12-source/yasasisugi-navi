@@ -1,4 +1,6 @@
 const form = document.querySelector("#navi-form");
+const lostButton = document.querySelector("#lost-button");
+const lostGuide = document.querySelector("#lost-guide");
 
 const fields = {
   destination: document.querySelector("#destination"),
@@ -68,5 +70,28 @@ function calculatePlan() {
     ` 家を出る目安は${formatTime(leaveTime)}、起きる目安は${formatTime(wakeTime)}です。`;
 }
 
-form.addEventListener("input", calculatePlan);
+function scrollToSection(targetId) {
+  const target = document.querySelector(`#${targetId}`);
+  if (!target) {
+    return;
+  }
+
+  target.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+document.querySelectorAll("[data-scroll-target]").forEach((button) => {
+  button.addEventListener("click", () => {
+    scrollToSection(button.dataset.scrollTarget);
+  });
+});
+
+lostButton.addEventListener("click", () => {
+  lostGuide.hidden = false;
+  lostGuide.scrollIntoView({ behavior: "smooth", block: "center" });
+});
+
+Object.values(fields).forEach((field) => {
+  field.addEventListener("input", calculatePlan);
+});
+
 calculatePlan();
