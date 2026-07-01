@@ -23,6 +23,9 @@ const output = {
   summary: document.querySelector("#summary")
 };
 
+const storageKey = "yasashisugNaviPlan";
+let savedValues = {};
+
 const stepComments = {
   wake: "起きられたね、えらい！",
   leave: "出発できたね、いい感じ！",
@@ -40,6 +43,37 @@ const stepState = {
 };
 
 let currentPlan = [];
+
+function getAvailableFields() {
+  return Object.values(fields).filter(Boolean);
+}
+
+function loadSavedPlan() {
+  savedValues = JSON.parse(localStorage.getItem(storageKey) || "{}");
+
+  Object.entries(fields).forEach(([key, field]) => {
+    if (field && savedValues[key] !== undefined) {
+      field.value = savedValues[key];
+    }
+  });
+}
+
+function savePlan() {
+  const nextPlan = { ...savedValues };
+
+  Object.entries(fields).forEach(([key, field]) => {
+    if (field) {
+      nextPlan[key] = field.value;
+    }
+  });
+
+  savedValues = nextPlan;
+  localStorage.setItem(storageKey, JSON.stringify(nextPlan));
+}
+
+function getValue(key, fallback = "") {
+  return fields[key]?.value ?? savedValues[key] ?? fallback;
+}
 
 function toMinutes(timeValue) {
   const [hours, minutes] = timeValue.split(":").map(Number);
@@ -63,15 +97,29 @@ function getNumber(field, fallback = 0) {
   return Number.isFinite(value) ? value : fallback;
 }
 
+function getNumberValue(key, fallback = 0) {
+  const value = Number(getValue(key, fallback));
+  return Number.isFinite(value) ? value : fallback;
+}
+
 function calculatePlan() {
-  const startTime = fields.startTime.value || "10:00";
-  const destination = fields.destination.value.trim() || "目的地";
-  const arrivalBuffer = Math.max(0, getNumber(fields.arrivalBuffer));
-  const distance = Math.max(0, getNumber(fields.distance));
-  const walkingSpeed = Math.max(0.1, getNumber(fields.walkingSpeed, 4));
-  const prepTime = Math.max(0, getNumber(fields.prepTime));
-  const breakfastTime = Math.max(0, getNumber(fields.breakfastTime));
-  const extraTime = Math.max(0, getNumber(fields.extraTime));
+  if (!getAvailableFields().length && !Object.keys(savedValues).length) {
+    updateNextReminder();
+    return;
+  }
+
+  if (!timeline && getAvailableFields().length) {
+    savePlan();
+  }
+
+  const startTime = getValue("startTime", "10:00") || "10:00";
+  const destination = getValue("destination", "目的地").trim() || "目的地";
+  const arrivalBuffer = Math.max(0, getNumberValue("arrivalBuffer"));
+  const distance = Math.max(0, getNumberValue("distance"));
+  const walkingSpeed = Math.max(0.1, getNumberValue("walkingSpeed", 4));
+  const prepTime = Math.max(0, getNumberValue("prepTime"));
+  const breakfastTime = Math.max(0, getNumberValue("breakfastTime"));
+  const extraTime = Math.max(0, getNumberValue("extraTime"));
 
   const travelTime = Math.ceil((distance / walkingSpeed) * 60);
   const startMinutes = toMinutes(startTime);
@@ -89,15 +137,25 @@ function calculatePlan() {
     { id: "arrive", time: targetArrival, label: "目的地に到着" }
   ];
 
-  output.summary.textContent =
-    `${destination}には${formatTime(targetArrival)}ごろ到着を目指します。` +
-    ` 移動は約${travelTime}分、予備時間は${extraTime}分です。`;
+  if (output.summary) {
+    output.summary.textContent =
+      `${destination}には${formatTime(targetArrival)}ごろ到着を目指します。` +
+      ` 移動は約${travelTime}分、予備時間は${extraTime}分です。`;
+  }
+
+  if (getAvailableFields().length) {
+    savePlan();
+  }
 
   updateNextReminder();
   renderTimeline();
 }
 
 function updateClock() {
+  if (!currentTimeOutput) {
+    return;
+  }
+
   const now = new Date();
   const hours = String(now.getHours()).padStart(2, "0");
   const minutes = String(now.getMinutes()).padStart(2, "0");
@@ -105,6 +163,10 @@ function updateClock() {
 }
 
 function updateNextReminder() {
+  if (!nextReminderOutput) {
+    return;
+  }
+
   if (!currentPlan.length) {
     nextReminderOutput.textContent = "最初の予定の5分前 --:--";
     return;
@@ -114,6 +176,10 @@ function updateNextReminder() {
 }
 
 function renderTimeline() {
+  if (!timeline) {
+    return;
+  }
+
   timeline.replaceChildren();
 
   currentPlan.forEach((step) => {
@@ -160,6 +226,11 @@ function renderTimeline() {
 function toggleComplete(stepId) {
   stepState[stepId].completed = !stepState[stepId].completed;
 
+  if (!navigatorMessage) {
+    renderTimeline();
+    return;
+  }
+
   if (stepState[stepId].completed) {
     navigatorMessage.textContent = stepComments[stepId];
   } else {
@@ -175,6 +246,10 @@ function toggleAlarm(stepId) {
 }
 
 function updateAchievement() {
+  if (!achievementPercent || !achievementCount || !achievementBlocks) {
+    return;
+  }
+
   const total = currentPlan.length;
   const completed = currentPlan.filter((step) => stepState[step.id].completed).length;
   const percent = total ? Math.round((completed / total) * 100) : 0;
@@ -191,28 +266,21 @@ function updateAchievement() {
   }
 }
 
-function scrollToSection(targetId) {
-  const target = document.querySelector(`#${targetId}`);
-  if (!target) {
-    return;
-  }
+if (lostButton && lostGuide) {
+  lostButton.addEventListener("click", () => {
+    lostGuide.hidden = false;
 
-  target.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (navigatorMessage) {
+      navigatorMessage.textContent = "迷ったら、見えるものを一つずつ確認しよう。";
+    }
+
+    lostGuide.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
 }
 
-document.querySelectorAll("[data-scroll-target]").forEach((button) => {
-  button.addEventListener("click", () => {
-    scrollToSection(button.dataset.scrollTarget);
-  });
-});
+loadSavedPlan();
 
-lostButton.addEventListener("click", () => {
-  lostGuide.hidden = false;
-  navigatorMessage.textContent = "迷ったら、見えるものを一つずつ確認しよう。";
-  lostGuide.scrollIntoView({ behavior: "smooth", block: "center" });
-});
-
-Object.values(fields).forEach((field) => {
+getAvailableFields().forEach((field) => {
   field.addEventListener("input", calculatePlan);
 });
 

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ゴールの設定 - Yasashisug Navi</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="subpage">
+    <nav class="page-nav" aria-label="ページ移動">
+      <a href="index.html">メインへ</a>
+      <a href="schedule.html">何時に出るか確認する</a>
+    </nav>
+
+    <section id="goal-section" class="section-panel" aria-labelledby="goal-title">
+      <div class="section-heading">
+        <p class="eyebrow">ゴール</p>
+        <h1 id="goal-title">ゴールの設定</h1>
+        <p>目的地と、何時に着きたいかを入れます。</p>
+      </div>
+
+      <div class="form form--goal">
+        <label class="field field--wide">
+          <span>目的地</span>
+          <input id="destination" type="text" value="はじめて行く場所" placeholder="例: クリニック、駅、待ち合わせ場所">
+        </label>
+
+        <label class="field">
+          <span>予定開始時刻</span>
+          <input id="start-time" type="time" value="10:00" required>
+        </label>
+
+        <label class="field">
+          <span>何分前に着きたい？</span>
+          <input id="arrival-buffer" type="number" min="0" step="1" value="10">
+        </label>
+      </div>
+
+      <div class="page-actions">
+        <a class="action-button" href="schedule.html">何時に出るか確認する</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -31,12 +31,12 @@
         <h1 id="home-title">やさしく出発を整えるナビ</h1>
 
         <div class="main-actions" aria-label="メインメニュー">
-          <button type="button" class="action-button" data-scroll-target="goal-section">
-            行き先をきめる
-          </button>
-          <button type="button" class="action-button" data-scroll-target="schedule-section">
-            よてい
-          </button>
+          <a class="action-button" href="goal.html">
+            ゴールの設定
+          </a>
+          <a class="action-button" href="schedule.html">
+            何時に出るか確認する
+          </a>
           <button type="button" class="action-button action-button--light" id="lost-button">
             迷った
           </button>
@@ -46,85 +46,6 @@
           <h2>迷ったときのサポート</h2>
           <p>見えるものや写真から現在地を確認する機能は今後追加予定です。今は、近くの目印や駅名をゆっくり確認してみましょう。</p>
         </div>
-      </div>
-    </section>
-
-    <section id="goal-section" class="section-panel" aria-labelledby="goal-title">
-      <div class="section-heading">
-        <p class="eyebrow">行き先</p>
-        <h2 id="goal-title">行き先をきめる</h2>
-        <p>目的地と、何時に着きたいかを入れます。</p>
-      </div>
-
-      <div class="form form--goal">
-        <label class="field field--wide">
-          <span>目的地</span>
-          <input id="destination" type="text" value="はじめて行く場所" placeholder="例: クリニック、駅、待ち合わせ場所">
-        </label>
-
-        <label class="field">
-          <span>予定開始時刻</span>
-          <input id="start-time" type="time" value="10:00" required>
-        </label>
-
-        <label class="field">
-          <span>何分前に着きたい？</span>
-          <input id="arrival-buffer" type="number" min="0" step="1" value="10">
-        </label>
-      </div>
-    </section>
-
-    <section id="check-section" class="section-panel planner" aria-labelledby="planner-title">
-      <div class="section-heading">
-        <p class="eyebrow">逆算</p>
-        <h2 id="planner-title">時間を調整する</h2>
-        <p>移動と準備にかかる時間を入れると、下の予定が更新されます。</p>
-      </div>
-
-      <form id="navi-form" class="form">
-        <label class="field">
-          <span>移動距離（km）</span>
-          <input id="distance" type="number" min="0" step="0.1" value="1.5">
-        </label>
-
-        <label class="field">
-          <span>歩く速さ（km/h）</span>
-          <input id="walking-speed" type="number" min="0.1" step="0.1" value="4.0">
-        </label>
-
-        <label class="field">
-          <span>準備時間（分）</span>
-          <input id="prep-time" type="number" min="0" step="1" value="45">
-        </label>
-
-        <label class="field">
-          <span>朝ごはん時間（分）</span>
-          <input id="breakfast-time" type="number" min="0" step="1" value="20">
-        </label>
-
-        <label class="field field--wide">
-          <span>迷った時の予備時間（分）</span>
-          <input id="extra-time" type="number" min="0" step="1" value="15">
-        </label>
-      </form>
-    </section>
-
-    <section id="schedule-section" class="section-panel schedule" aria-live="polite" aria-labelledby="schedule-title">
-      <div class="section-heading">
-        <p class="eyebrow">よてい</p>
-        <h2 id="schedule-title">今日のタイムライン</h2>
-        <p id="summary">入力すると、ここに今日の流れが表示されます。</p>
-      </div>
-
-      <div id="timeline" class="timeline"></div>
-
-      <div class="achievement" aria-labelledby="achievement-title">
-        <div class="achievement__header">
-          <h3 id="achievement-title">今日の達成度</h3>
-          <strong id="achievement-percent">0%</strong>
-        </div>
-        <div id="achievement-blocks" class="achievement__blocks" aria-hidden="true"></div>
-        <p id="achievement-count" class="achievement__count">0 / 5 完了</p>
       </div>
     </section>
   </main>
