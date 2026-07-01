@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yasashisug Navi</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__inner">
+      <p class="eyebrow">ADHD傾向・方向音痴・移動不安に寄りそうナビ</p>
+      <h1>Yasashisug Navi</h1>
+      <p class="lead">
+        予定時刻から逆算して、起きる時間と家を出る時間をやさしく整理します。
+        急かしすぎず、でも必要な時間ははっきり伝えるためのMVPです。
+      </p>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="intro" aria-labelledby="concept-title">
+      <h2 id="concept-title">このアプリが助けること</h2>
+      <div class="feature-grid">
+        <article>
+          <h3>逆算が苦手でも大丈夫</h3>
+          <p>予定時刻から、到着したい時間・家を出る時間・起きる時間を順番に計算します。</p>
+        </article>
+        <article>
+          <h3>歩く速さに合わせる</h3>
+          <p>移動距離と歩行速度から、あなたのペースに近い移動時間を出します。</p>
+        </article>
+        <article>
+          <h3>迷いやすさも見込む</h3>
+          <p>予備時間を含めて計算するので、初めての場所でも少し余裕を作れます。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="planner" aria-labelledby="planner-title">
+      <div class="planner__header">
+        <div>
+          <p class="eyebrow">今日の移動プラン</p>
+          <h2 id="planner-title">必要な時間をいっしょに逆算</h2>
+        </div>
+        <p class="planner__note">入力したら自動で計算します。わからない項目はあとで調整できます。</p>
+      </div>
+
+      <form id="navi-form" class="form">
+        <label class="field field--wide">
+          <span>目的地</span>
+          <input id="destination" type="text" value="はじめて行く場所" placeholder="例: クリニック、駅、面接会場">
+        </label>
+
+        <label class="field">
+          <span>予定開始時刻</span>
+          <input id="start-time" type="time" value="10:00" required>
+        </label>
+
+        <label class="field">
+          <span>何分前に着きたいか</span>
+          <input id="arrival-buffer" type="number" min="0" step="1" value="10">
+        </label>
+
+        <label class="field">
+          <span>移動距離（km）</span>
+          <input id="distance" type="number" min="0" step="0.1" value="1.5">
+        </label>
+
+        <label class="field">
+          <span>歩行速度（km/h）</span>
+          <input id="walking-speed" type="number" min="0.1" step="0.1" value="4.0">
+        </label>
+
+        <label class="field">
+          <span>準備時間（分）</span>
+          <input id="prep-time" type="number" min="0" step="1" value="45">
+        </label>
+
+        <label class="field">
+          <span>朝ごはん時間（分）</span>
+          <input id="breakfast-time" type="number" min="0" step="1" value="20">
+        </label>
+
+        <label class="field">
+          <span>迷った時の予備時間（分）</span>
+          <input id="extra-time" type="number" min="0" step="1" value="15">
+        </label>
+      </form>
+    </section>
+
+    <section class="result" aria-live="polite" aria-labelledby="result-title">
+      <div class="result__header">
+        <p class="eyebrow">計算結果</p>
+        <h2 id="result-title">この時間を目安にすると安心です</h2>
+      </div>
+
+      <div class="result-grid">
+        <article class="result-card result-card--primary">
+          <p>起きる時間</p>
+          <strong id="wake-time">--:--</strong>
+          <span>ここから準備を始めれば間に合いやすいです。</span>
+        </article>
+        <article class="result-card result-card--primary">
+          <p>家を出る時間</p>
+          <strong id="leave-time">--:--</strong>
+          <span>この時間になったら出発の合図です。</span>
+        </article>
+        <article class="result-card">
+          <p>到着したい時間</p>
+          <strong id="target-arrival-time">--:--</strong>
+          <span>予定開始より少し前に着く設定です。</span>
+        </article>
+        <article class="result-card">
+          <p>移動時間の目安</p>
+          <strong id="travel-time">--分</strong>
+          <span>歩く速さと距離から計算しています。</span>
+        </article>
+      </div>
+
+      <div id="summary" class="summary"></div>
+    </section>
+
+    <section class="future" aria-labelledby="future-title">
+      <h2 id="future-title">これから追加したいこと</h2>
+      <ul>
+        <li>ルートから外れたら、責めずにやさしく通知する</li>
+        <li>迷ったら、写真や見えるものから現在地確認を助ける</li>
+        <li>GPSや地図と連携して、今いる場所をわかりやすく表示する</li>
+        <li>出発前の小さなリマインダーを段階的に出す</li>
+      </ul>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
