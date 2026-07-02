@@ -395,17 +395,6 @@ h1:not(.home-title) {
   padding-left: 18px;
 }
 
-.route-points::before {
-  content: "";
-  position: absolute;
-  top: 36px;
-  bottom: 36px;
-  left: 11px;
-  width: 4px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #82ccf1, var(--blue));
-}
-
 .route-field {
   position: relative;
   display: grid;
