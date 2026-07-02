@@ -21,20 +21,36 @@
       </div>
 
       <div class="route-form">
-        <div class="route-points" aria-label="出発地と到着地">
-          <label class="route-field route-field--start">
-            <span>出発地（スタート）</span>
-            <input id="start-place" type="text" placeholder="例：蒲田">
-          </label>
+        <section class="start-choice" aria-labelledby="start-choice-title">
+          <h2 id="start-choice-title">出発場所を選択</h2>
+          <div class="choice-buttons">
+            <label class="choice-button">
+              <input id="start-home" type="radio" name="start-type" value="home" checked>
+              <span>家から</span>
+            </label>
+            <label class="choice-button">
+              <input id="start-work" type="radio" name="start-type" value="work">
+              <span>職場から</span>
+            </label>
+            <label class="choice-button">
+              <input id="start-current" type="radio" name="start-type" value="current">
+              <span>現在地から</span>
+            </label>
+          </div>
+          <p id="current-location-note" class="current-location-note" hidden>
+            現在地機能は今後追加予定です。現在は仮の最寄り駅で計算しています。
+          </p>
+        </section>
 
+        <div class="route-points" aria-label="到着地">
           <label class="route-field route-field--goal">
-            <span>到着地（ゴール）</span>
+            <span>到着地</span>
             <input id="goal-place" type="text" placeholder="例：川崎">
           </label>
         </div>
 
         <section class="arrival-card" aria-labelledby="arrival-title">
-          <h2 id="arrival-title">なんじにつきたい？</h2>
+          <h2 id="arrival-title">到着希望日時</h2>
           <div class="date-buttons" aria-label="到着日">
             <button id="today-button" class="date-button is-selected" type="button">今日</button>
             <button id="tomorrow-button" class="date-button" type="button">明日</button>
@@ -93,8 +109,21 @@
       </div>
 
       <div class="page-actions">
-        <a class="action-button" href="schedule.html">やさしく案内してもらう</a>
+        <button id="route-search-button" class="secondary-action" type="button">
+          乗換案内で調べる
+        </button>
       </div>
+
+      <label class="route-field train-time-field">
+        <span>電車に乗る時間</span>
+        <input id="train-time" type="time">
+      </label>
+
+      <div class="page-actions">
+        <button id="calculate-button" class="action-button" type="button">逆算する</button>
+      </div>
+
+      <div id="result-area" class="route-result" aria-live="polite"></div>
     </section>
   </main>
 

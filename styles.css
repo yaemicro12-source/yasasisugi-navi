@@ -331,6 +331,63 @@ h1:not(.home-title) {
   gap: 18px;
 }
 
+.start-choice {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid #cce8f7;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff, var(--surface-blue));
+}
+
+.start-choice h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(1.3rem, 5vw, 1.75rem);
+  line-height: 1.2;
+}
+
+.choice-buttons {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.choice-button {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: center;
+  min-height: 56px;
+  padding: 12px 14px;
+  border: 2px solid #b9ddef;
+  border-radius: 16px;
+  background: #ffffff;
+  color: var(--blue-strong);
+  font-weight: 900;
+}
+
+.choice-button:has(input:checked) {
+  border-color: var(--blue);
+  background: #e7f7ff;
+  box-shadow: 0 12px 26px rgba(31, 127, 209, 0.12);
+}
+
+.choice-button input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--blue);
+}
+
+.current-location-note {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--warm-soft);
+  color: var(--muted);
+  font-weight: 750;
+}
+
 .route-points {
   position: relative;
   display: grid;
@@ -435,6 +492,73 @@ h1:not(.home-title) {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+}
+
+.secondary-action {
+  min-height: 58px;
+  width: 100%;
+  border: 2px solid #8ccdf0;
+  border-radius: 14px;
+  background: #ffffff;
+  color: var(--blue-strong);
+  font-size: 1.02rem;
+  font-weight: 900;
+}
+
+.train-time-field {
+  margin-top: 4px;
+}
+
+.route-result {
+  margin-top: 22px;
+  padding: 18px;
+  border: 1px solid #ffd4c8;
+  border-radius: 18px;
+  background: var(--warm-soft);
+}
+
+.route-result:empty {
+  display: none;
+}
+
+.route-result h2 {
+  margin: 0 0 14px;
+  color: var(--text);
+  font-size: 1.35rem;
+}
+
+.route-result p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 750;
+}
+
+.route-result-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.route-result-list div {
+  display: grid;
+  grid-template-columns: minmax(118px, 0.8fr) minmax(0, 1.2fr);
+  gap: 10px;
+  align-items: baseline;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.route-result-list dt {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.route-result-list dd {
+  margin: 0;
+  color: var(--warm-strong);
+  font-size: 1.16rem;
+  font-weight: 900;
 }
 
 .timeline {

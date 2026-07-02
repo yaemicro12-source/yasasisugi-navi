@@ -7,12 +7,19 @@ const timeline = document.querySelector("#timeline");
 const achievementPercent = document.querySelector("#achievement-percent");
 const achievementBlocks = document.querySelector("#achievement-blocks");
 const achievementCount = document.querySelector("#achievement-count");
+const startHome = document.querySelector("#start-home");
+const startWork = document.querySelector("#start-work");
+const startCurrent = document.querySelector("#start-current");
+const currentLocationNote = document.querySelector("#current-location-note");
+const routeSearchButton = document.querySelector("#route-search-button");
+const calculateButton = document.querySelector("#calculate-button");
+const resultArea = document.querySelector("#result-area");
 
 const fields = {
-  startPlace: document.querySelector("#start-place"),
   goalPlace: document.querySelector("#goal-place"),
   arrivalHour: document.querySelector("#arrival-hour"),
   arrivalMinute: document.querySelector("#arrival-minute"),
+  trainTime: document.querySelector("#train-time"),
   destination: document.querySelector("#destination"),
   startTime: document.querySelector("#start-time"),
   arrivalBuffer: document.querySelector("#arrival-buffer"),
@@ -31,6 +38,28 @@ const output = {
 
 const storageKey = "yasashisugNaviPlan";
 let savedValues = {};
+let startType = "home";
+
+const userRouteSettings = {
+  preparationMinutes: 30,
+  starts: {
+    home: {
+      label: "家",
+      station: "東京",
+      stationMinutes: 10
+    },
+    work: {
+      label: "職場",
+      station: "渋谷",
+      stationMinutes: 8
+    },
+    current: {
+      label: "現在地",
+      station: "現在地の最寄り駅（仮）",
+      stationMinutes: 12
+    }
+  }
+};
 
 const stepComments = {
   wake: "起きられたね、えらい！",
@@ -71,6 +100,7 @@ function loadSavedPlan() {
     fields.startTime.value = `${savedValues.arrivalHour}:${savedValues.arrivalMinute}`;
   }
 
+  setStartType(savedValues.startType || "home", { shouldSave: false });
   updateDateButtons(savedValues.arrivalDay || "today");
 }
 
@@ -89,6 +119,10 @@ function savePlan() {
 
   if (fields.arrivalHour && fields.arrivalMinute) {
     nextPlan.startTime = `${fields.arrivalHour.value}:${fields.arrivalMinute.value}`;
+  }
+
+  if (startHome || startWork || startCurrent) {
+    nextPlan.startType = startType;
   }
 
   savedValues = nextPlan;
@@ -132,6 +166,107 @@ function getNumber(field, fallback = 0) {
 function getNumberValue(key, fallback = 0) {
   const value = Number(getValue(key, fallback));
   return Number.isFinite(value) ? value : fallback;
+}
+
+function setStartType(nextStartType, options = {}) {
+  startType = nextStartType;
+
+  if (startHome) {
+    startHome.checked = startType === "home";
+  }
+
+  if (startWork) {
+    startWork.checked = startType === "work";
+  }
+
+  if (startCurrent) {
+    startCurrent.checked = startType === "current";
+  }
+
+  if (currentLocationNote) {
+    currentLocationNote.hidden = startType !== "current";
+  }
+
+  if (options.shouldSave !== false) {
+    savePlan();
+  }
+}
+
+function getStartSetting() {
+  if (startType === "current") {
+    return resolveCurrentLocationStation();
+  }
+
+  return userRouteSettings.starts[startType] || userRouteSettings.starts.home;
+}
+
+function resolveCurrentLocationStation() {
+  // Later, navigator.geolocation.getCurrentPosition() can replace this placeholder.
+  return userRouteSettings.starts.current;
+}
+
+function getArrivalTimeText() {
+  const hour = fields.arrivalHour?.value || savedValues.arrivalHour || "10";
+  const minute = fields.arrivalMinute?.value || savedValues.arrivalMinute || "00";
+  return `${hour}:${minute}`;
+}
+
+function openRouteSearch() {
+  savePlan();
+
+  const startSetting = getStartSetting();
+  const goalPlace = getValue("goalPlace", "川崎").trim() || "川崎";
+  const query = `${startSetting.station} から ${goalPlace} 乗換 到着 ${getArrivalTimeText()}`;
+  window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, "_blank", "noopener");
+}
+
+function renderRouteResult() {
+  if (!resultArea) {
+    return;
+  }
+
+  savePlan();
+
+  const trainTime = fields.trainTime?.value;
+  if (!trainTime) {
+    resultArea.innerHTML = "<p>電車に乗る時間を入れると、出る時間を逆算できます。</p>";
+    return;
+  }
+
+  const startSetting = getStartSetting();
+  const trainMinutes = toMinutes(trainTime);
+  const leaveMinutes = trainMinutes - startSetting.stationMinutes;
+  const preparationStartMinutes = leaveMinutes - userRouteSettings.preparationMinutes;
+
+  resultArea.innerHTML = `
+    <h2>やさしい逆算</h2>
+    <dl class="route-result-list">
+      <div>
+        <dt>出発場所</dt>
+        <dd>${startSetting.label}</dd>
+      </div>
+      <div>
+        <dt>利用する駅</dt>
+        <dd>${startSetting.station}</dd>
+      </div>
+      <div>
+        <dt>駅まで</dt>
+        <dd>${startSetting.stationMinutes}分</dd>
+      </div>
+      <div>
+        <dt>電車に乗る時間</dt>
+        <dd>${formatTime(trainMinutes)}</dd>
+      </div>
+      <div>
+        <dt>${startSetting.label}を出る時間</dt>
+        <dd>${formatTime(leaveMinutes)}</dd>
+      </div>
+      <div>
+        <dt>支度開始時間</dt>
+        <dd>${formatTime(preparationStartMinutes)}</dd>
+      </div>
+    </dl>
+  `;
 }
 
 function calculatePlan() {
@@ -331,6 +466,26 @@ if (todayButton) {
 
 if (tomorrowButton) {
   tomorrowButton.addEventListener("click", () => selectArrivalDay("tomorrow"));
+}
+
+if (startHome) {
+  startHome.addEventListener("change", () => setStartType("home"));
+}
+
+if (startWork) {
+  startWork.addEventListener("change", () => setStartType("work"));
+}
+
+if (startCurrent) {
+  startCurrent.addEventListener("change", () => setStartType("current"));
+}
+
+if (routeSearchButton) {
+  routeSearchButton.addEventListener("click", openRouteSearch);
+}
+
+if (calculateButton) {
+  calculateButton.addEventListener("click", renderRouteResult);
 }
 
 loadSavedPlan();
