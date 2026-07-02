@@ -14,6 +14,13 @@ const currentLocationNote = document.querySelector("#current-location-note");
 const routeSearchButton = document.querySelector("#route-search-button");
 const calculateButton = document.querySelector("#calculate-button");
 const resultArea = document.querySelector("#result-area");
+const finalSchedule = document.querySelector("#final-schedule");
+const bufferHelpButton = document.querySelector("#buffer-help-button");
+const bufferHelp = document.querySelector("#buffer-help");
+const bufferDecrease = document.querySelector("#buffer-decrease");
+const bufferIncrease = document.querySelector("#buffer-increase");
+const bufferMinutesOutput = document.querySelector("#buffer-minutes");
+const arrivalComplete = document.querySelector("#arrival-complete");
 
 const fields = {
   goalPlace: document.querySelector("#goal-place"),
@@ -39,6 +46,7 @@ const output = {
 const storageKey = "yasashisugNaviPlan";
 let savedValues = {};
 let startType = "home";
+let recommendedBufferMinutes = 25;
 
 const userRouteSettings = {
   preparationMinutes: 30,
@@ -101,7 +109,9 @@ function loadSavedPlan() {
   }
 
   setStartType(savedValues.startType || "home", { shouldSave: false });
+  setRecommendedBuffer(getSavedNumber("recommendedBufferMinutes", 25), { shouldSave: false });
   updateDateButtons(savedValues.arrivalDay || "today");
+  renderFinalSchedule();
 }
 
 function savePlan() {
@@ -123,6 +133,10 @@ function savePlan() {
 
   if (startHome || startWork || startCurrent) {
     nextPlan.startType = startType;
+  }
+
+  if (bufferMinutesOutput) {
+    nextPlan.recommendedBufferMinutes = recommendedBufferMinutes;
   }
 
   savedValues = nextPlan;
@@ -168,6 +182,11 @@ function getNumberValue(key, fallback = 0) {
   return Number.isFinite(value) ? value : fallback;
 }
 
+function getSavedNumber(key, fallback = 0) {
+  const value = Number(savedValues[key]);
+  return Number.isFinite(value) ? value : fallback;
+}
+
 function setStartType(nextStartType, options = {}) {
   startType = nextStartType;
 
@@ -209,6 +228,10 @@ function getArrivalTimeText() {
   const hour = fields.arrivalHour?.value || savedValues.arrivalHour || "10";
   const minute = fields.arrivalMinute?.value || savedValues.arrivalMinute || "00";
   return `${hour}:${minute}`;
+}
+
+function getTrainTimeText() {
+  return fields.trainTime?.value || savedValues.trainTime || "";
 }
 
 function openRouteSearch() {
@@ -269,6 +292,79 @@ function renderRouteResult() {
   `;
 }
 
+function moveToSchedulePage() {
+  savePlan();
+  window.location.href = "schedule.html";
+}
+
+function setRecommendedBuffer(nextMinutes, options = {}) {
+  recommendedBufferMinutes = Math.min(30, Math.max(0, Math.round(nextMinutes / 5) * 5));
+
+  if (bufferMinutesOutput) {
+    bufferMinutesOutput.textContent = String(recommendedBufferMinutes);
+  }
+
+  if (options.shouldSave !== false) {
+    savePlan();
+  }
+
+  renderFinalSchedule();
+}
+
+function renderFinalSchedule() {
+  if (!finalSchedule) {
+    return;
+  }
+
+  const trainTime = getTrainTimeText();
+  if (!trainTime) {
+    finalSchedule.innerHTML = "<p>もくてきちページで、電車に乗る時間を入れると予定を表示できます。</p>";
+    return;
+  }
+
+  const startSetting = getStartSetting();
+  const arrivalBuffer = Math.max(0, getNumberValue("arrivalBuffer", 10));
+  const trainMinutes = toMinutes(trainTime);
+  const leaveMinutes = trainMinutes - startSetting.stationMinutes - recommendedBufferMinutes;
+  const preparationStartMinutes = leaveMinutes - userRouteSettings.preparationMinutes;
+
+  finalSchedule.innerHTML = `
+    <h2>最終スケジュール</h2>
+    <dl class="route-result-list">
+      <div>
+        <dt>到着希望時間</dt>
+        <dd>${getArrivalTimeText()}</dd>
+      </div>
+      <div>
+        <dt>何分前につく予定か</dt>
+        <dd>${arrivalBuffer}分前</dd>
+      </div>
+      <div>
+        <dt>電車に乗る時間</dt>
+        <dd>${formatTime(trainMinutes)}</dd>
+      </div>
+      <div>
+        <dt>${startSetting.label}を出る時間</dt>
+        <dd>${formatTime(leaveMinutes)}</dd>
+      </div>
+      <div>
+        <dt>支度開始時間</dt>
+        <dd>${formatTime(preparationStartMinutes)}</dd>
+      </div>
+      <div>
+        <dt>予備時間</dt>
+        <dd>${recommendedBufferMinutes}分</dd>
+      </div>
+    </dl>
+  `;
+}
+
+function clearPlanAndStartNew() {
+  localStorage.removeItem(storageKey);
+  savedValues = {};
+  window.location.href = "goal.html";
+}
+
 function calculatePlan() {
   if (!getAvailableFields().length && !Object.keys(savedValues).length) {
     updateNextReminder();
@@ -316,6 +412,7 @@ function calculatePlan() {
 
   updateNextReminder();
   renderTimeline();
+  renderFinalSchedule();
 }
 
 function updateClock() {
@@ -485,7 +582,31 @@ if (routeSearchButton) {
 }
 
 if (calculateButton) {
-  calculateButton.addEventListener("click", renderRouteResult);
+  calculateButton.addEventListener("click", moveToSchedulePage);
+}
+
+if (bufferHelpButton && bufferHelp) {
+  bufferHelpButton.addEventListener("click", () => {
+    const nextHidden = !bufferHelp.hidden;
+    bufferHelp.hidden = nextHidden;
+    bufferHelpButton.setAttribute("aria-expanded", String(!nextHidden));
+  });
+}
+
+if (bufferDecrease) {
+  bufferDecrease.addEventListener("click", () => setRecommendedBuffer(recommendedBufferMinutes - 5));
+}
+
+if (bufferIncrease) {
+  bufferIncrease.addEventListener("click", () => setRecommendedBuffer(recommendedBufferMinutes + 5));
+}
+
+if (arrivalComplete) {
+  arrivalComplete.addEventListener("change", () => {
+    if (arrivalComplete.checked) {
+      clearPlanAndStartNew();
+    }
+  });
 }
 
 loadSavedPlan();

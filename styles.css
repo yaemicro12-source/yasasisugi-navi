@@ -494,6 +494,110 @@ h1:not(.home-title) {
   gap: 12px;
 }
 
+.schedule-controls {
+  display: grid;
+  gap: 18px;
+}
+
+.buffer-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid #cce8f7;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff, var(--surface-blue));
+}
+
+.buffer-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.buffer-heading h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.18rem;
+  line-height: 1.2;
+}
+
+.help-button {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 2px solid #9bd4f4;
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--blue-strong);
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.buffer-help {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.buffer-stepper {
+  display: grid;
+  grid-template-columns: 48px minmax(64px, auto) 48px auto;
+  gap: 10px;
+  align-items: center;
+  justify-content: start;
+}
+
+.buffer-stepper button {
+  width: 48px;
+  height: 48px;
+  border: 2px solid #9bd4f4;
+  border-radius: 14px;
+  background: #ffffff;
+  color: var(--blue-strong);
+  font-size: 1.4rem;
+  font-weight: 900;
+}
+
+.buffer-stepper strong {
+  display: grid;
+  place-items: center;
+  min-width: 64px;
+  min-height: 48px;
+  border-radius: 14px;
+  background: #ffffff;
+  color: var(--warm-strong);
+  font-size: 1.45rem;
+}
+
+.buffer-stepper span {
+  color: var(--muted);
+  font-weight: 850;
+}
+
+.arrival-complete {
+  margin-top: 18px;
+}
+
+.complete-check {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid #cce8f7;
+  border-radius: 16px;
+  background: #ffffff;
+  color: var(--blue-strong);
+  font-weight: 900;
+}
+
+.complete-check input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--blue);
+}
+
 .secondary-action {
   min-height: 58px;
   width: 100%;
