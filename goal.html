@@ -15,30 +15,85 @@
 
     <section id="goal-section" class="section-panel" aria-labelledby="goal-title">
       <div class="section-heading">
-        <p class="eyebrow">ゴール</p>
-        <h1 id="goal-title">もくてきち</h1>
-        <p>目的地と、何時に着きたいかを入れます。</p>
+        <p class="eyebrow">もくてきち</p>
+        <h1 id="goal-title">どこからどこへ行く？</h1>
+        <p>出発地と到着地を入れて、つきたい時間を決めます。</p>
       </div>
 
-      <div class="form form--goal">
-        <label class="field field--wide">
-          <span>目的地</span>
-          <input id="destination" type="text" value="はじめて行く場所" placeholder="例: クリニック、駅、待ち合わせ場所">
-        </label>
+      <div class="route-form">
+        <div class="route-points" aria-label="出発地と到着地">
+          <label class="route-field route-field--start">
+            <span>出発地（スタート）</span>
+            <input id="start-place" type="text" placeholder="例：蒲田">
+          </label>
 
-        <label class="field">
-          <span>予定開始時刻</span>
-          <input id="start-time" type="time" value="10:00" required>
-        </label>
+          <label class="route-field route-field--goal">
+            <span>到着地（ゴール）</span>
+            <input id="goal-place" type="text" placeholder="例：川崎">
+          </label>
+        </div>
 
-        <label class="field">
-          <span>何分前に着きたい？</span>
-          <input id="arrival-buffer" type="number" min="0" step="1" value="10">
-        </label>
+        <section class="arrival-card" aria-labelledby="arrival-title">
+          <h2 id="arrival-title">なんじにつきたい？</h2>
+          <div class="date-buttons" aria-label="到着日">
+            <button id="today-button" class="date-button is-selected" type="button">今日</button>
+            <button id="tomorrow-button" class="date-button" type="button">明日</button>
+          </div>
+
+          <div class="arrival-time">
+            <label class="field">
+              <span>時</span>
+              <select id="arrival-hour" aria-label="到着希望時刻の時">
+                <option value="00">00</option>
+                <option value="01">01</option>
+                <option value="02">02</option>
+                <option value="03">03</option>
+                <option value="04">04</option>
+                <option value="05">05</option>
+                <option value="06">06</option>
+                <option value="07">07</option>
+                <option value="08">08</option>
+                <option value="09">09</option>
+                <option value="10" selected>10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>分</span>
+              <select id="arrival-minute" aria-label="到着希望時刻の分">
+                <option value="00" selected>00</option>
+                <option value="05">05</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="25">25</option>
+                <option value="30">30</option>
+                <option value="35">35</option>
+                <option value="40">40</option>
+                <option value="45">45</option>
+                <option value="50">50</option>
+                <option value="55">55</option>
+              </select>
+            </label>
+          </div>
+        </section>
       </div>
 
       <div class="page-actions">
-        <a class="action-button" href="schedule.html">スケジュール</a>
+        <a class="action-button" href="schedule.html">やさしく案内してもらう</a>
       </div>
     </section>
   </main>

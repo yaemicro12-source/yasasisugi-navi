@@ -33,7 +33,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -313,7 +314,8 @@ h1:not(.home-title) {
   font-weight: 800;
 }
 
-.field input {
+.field input,
+.field select {
   min-height: 58px;
   width: 100%;
   border: 2px solid #b9ddef;
@@ -322,6 +324,117 @@ h1:not(.home-title) {
   color: var(--text);
   padding: 12px 14px;
   font-size: 1.08rem;
+}
+
+.route-form {
+  display: grid;
+  gap: 18px;
+}
+
+.route-points {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  padding-left: 18px;
+}
+
+.route-points::before {
+  content: "";
+  position: absolute;
+  top: 36px;
+  bottom: 36px;
+  left: 11px;
+  width: 4px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #82ccf1, var(--blue));
+}
+
+.route-field {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid #cce8f7;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.route-field::before {
+  content: "";
+  position: absolute;
+  left: -18px;
+  top: 28px;
+  width: 18px;
+  height: 18px;
+  border: 4px solid var(--blue);
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 0 5px #eef9ff;
+}
+
+.route-field--goal::before {
+  border-color: var(--warm-strong);
+}
+
+.route-field span {
+  color: var(--blue-strong);
+  font-size: 1.02rem;
+  font-weight: 850;
+}
+
+.route-field input {
+  min-height: 62px;
+  width: 100%;
+  border: 2px solid #b9ddef;
+  border-radius: 14px;
+  background: #f8fdff;
+  color: var(--text);
+  padding: 12px 14px;
+  font-size: 1.18rem;
+  font-weight: 800;
+}
+
+.arrival-card {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid #cce8f7;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff, var(--surface-blue));
+}
+
+.arrival-card h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(1.35rem, 5vw, 1.85rem);
+  line-height: 1.2;
+}
+
+.date-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.date-button {
+  min-height: 50px;
+  border: 2px solid #9bd4f4;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--blue-strong);
+  font-weight: 900;
+}
+
+.date-button.is-selected {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #ffffff;
+}
+
+.arrival-time {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .timeline {

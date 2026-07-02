@@ -9,6 +9,10 @@ const achievementBlocks = document.querySelector("#achievement-blocks");
 const achievementCount = document.querySelector("#achievement-count");
 
 const fields = {
+  startPlace: document.querySelector("#start-place"),
+  goalPlace: document.querySelector("#goal-place"),
+  arrivalHour: document.querySelector("#arrival-hour"),
+  arrivalMinute: document.querySelector("#arrival-minute"),
   destination: document.querySelector("#destination"),
   startTime: document.querySelector("#start-time"),
   arrivalBuffer: document.querySelector("#arrival-buffer"),
@@ -18,6 +22,8 @@ const fields = {
   breakfastTime: document.querySelector("#breakfast-time"),
   extraTime: document.querySelector("#extra-time")
 };
+const todayButton = document.querySelector("#today-button");
+const tomorrowButton = document.querySelector("#tomorrow-button");
 
 const output = {
   summary: document.querySelector("#summary")
@@ -56,6 +62,16 @@ function loadSavedPlan() {
       field.value = savedValues[key];
     }
   });
+
+  if (fields.destination && savedValues.goalPlace) {
+    fields.destination.value = savedValues.goalPlace;
+  }
+
+  if (fields.startTime && savedValues.arrivalHour && savedValues.arrivalMinute) {
+    fields.startTime.value = `${savedValues.arrivalHour}:${savedValues.arrivalMinute}`;
+  }
+
+  updateDateButtons(savedValues.arrivalDay || "today");
 }
 
 function savePlan() {
@@ -67,11 +83,27 @@ function savePlan() {
     }
   });
 
+  if (fields.goalPlace) {
+    nextPlan.destination = fields.goalPlace.value;
+  }
+
+  if (fields.arrivalHour && fields.arrivalMinute) {
+    nextPlan.startTime = `${fields.arrivalHour.value}:${fields.arrivalMinute.value}`;
+  }
+
   savedValues = nextPlan;
   localStorage.setItem(storageKey, JSON.stringify(nextPlan));
 }
 
 function getValue(key, fallback = "") {
+  if (key === "destination") {
+    return fields.destination?.value ?? savedValues.destination ?? savedValues.goalPlace ?? fallback;
+  }
+
+  if (key === "startTime" && savedValues.arrivalHour && savedValues.arrivalMinute) {
+    return fields.startTime?.value ?? savedValues.startTime ?? `${savedValues.arrivalHour}:${savedValues.arrivalMinute}`;
+  }
+
   return fields[key]?.value ?? savedValues[key] ?? fallback;
 }
 
@@ -266,6 +298,21 @@ function updateAchievement() {
   }
 }
 
+function updateDateButtons(nextDay) {
+  if (!todayButton || !tomorrowButton) {
+    return;
+  }
+
+  savedValues.arrivalDay = nextDay;
+  todayButton.classList.toggle("is-selected", nextDay === "today");
+  tomorrowButton.classList.toggle("is-selected", nextDay === "tomorrow");
+}
+
+function selectArrivalDay(nextDay) {
+  updateDateButtons(nextDay);
+  savePlan();
+}
+
 if (lostButton && lostGuide) {
   lostButton.addEventListener("click", () => {
     lostGuide.hidden = false;
@@ -278,10 +325,19 @@ if (lostButton && lostGuide) {
   });
 }
 
+if (todayButton) {
+  todayButton.addEventListener("click", () => selectArrivalDay("today"));
+}
+
+if (tomorrowButton) {
+  tomorrowButton.addEventListener("click", () => selectArrivalDay("tomorrow"));
+}
+
 loadSavedPlan();
 
 getAvailableFields().forEach((field) => {
   field.addEventListener("input", calculatePlan);
+  field.addEventListener("change", calculatePlan);
 });
 
 updateClock();
