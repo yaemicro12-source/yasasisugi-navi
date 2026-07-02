@@ -207,7 +207,7 @@ h1:not(.home-title) {
 .alarm-toggle:focus-visible,
 .secondary-action:focus-visible,
 .date-button:focus-visible,
-.choice-button:focus-within {
+.choice-button:focus-within:not(:has(input[type="radio"])) {
   outline: 4px solid rgba(31, 85, 143, 0.24);
   outline-offset: 3px;
 }
@@ -388,6 +388,10 @@ h1:not(.home-title) {
   width: 20px;
   height: 20px;
   accent-color: var(--blue);
+}
+
+.choice-button:focus-within {
+  outline: none;
 }
 
 .current-location-note {
