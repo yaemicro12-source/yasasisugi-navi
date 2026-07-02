@@ -10,46 +10,17 @@
   <main class="subpage">
     <nav class="page-nav" aria-label="ページ移動">
       <a href="index.html">メインへ</a>
-      <a href="goal.html">もくてきちへ</a>
+      <a href="schedule-setting.html">微調整へ</a>
     </nav>
 
-    <section id="schedule-adjust-section" class="section-panel planner" aria-labelledby="planner-title">
+    <section id="schedule-section" class="section-panel schedule-page" aria-live="polite" aria-labelledby="schedule-title">
       <div class="section-heading">
-        <p class="eyebrow">調整</p>
-        <h1 id="planner-title">スケジュール</h1>
-        <p>到着前の余裕と予備時間だけを調整します。</p>
+        <p class="eyebrow">今日の予定</p>
+        <h1 id="schedule-title">次にやること</h1>
+        <p id="summary">今日の流れを確認します。</p>
       </div>
 
-      <div class="schedule-controls">
-        <label class="field">
-          <span>何分前につきたいか</span>
-          <select id="arrival-buffer">
-            <option value="5">5分前</option>
-            <option value="10" selected>10分前</option>
-            <option value="15">15分前</option>
-            <option value="20">20分前</option>
-            <option value="30">30分前</option>
-          </select>
-        </label>
-
-        <section class="buffer-card" aria-labelledby="buffer-title">
-          <div class="buffer-heading">
-            <h2 id="buffer-title">おすすめの予備時間</h2>
-            <button id="buffer-help-button" class="help-button" type="button" aria-expanded="false" aria-controls="buffer-help">?</button>
-          </div>
-          <p id="buffer-help" class="buffer-help" hidden>
-            予備時間とは、電車の遅延や信号待ちなどに備えて、余裕を持って到着するための時間です。
-          </p>
-          <div class="buffer-stepper">
-            <button id="buffer-decrease" type="button" aria-label="予備時間を5分減らす">－</button>
-            <strong><span id="buffer-minutes">25</span></strong>
-            <button id="buffer-increase" type="button" aria-label="予備時間を5分増やす">＋</button>
-            <span>分</span>
-          </div>
-        </section>
-      </div>
-
-      <div id="final-schedule" class="route-result" aria-live="polite"></div>
+      <div id="timeline" class="timeline timeline--schedule"></div>
 
       <div class="arrival-complete">
         <label class="complete-check">

@@ -394,6 +394,52 @@ h1:not(.home-title) {
   outline: none;
 }
 
+.compact-choice {
+  display: grid;
+  gap: 10px;
+}
+
+.compact-choice h2 {
+  margin: 0;
+  color: var(--blue-strong);
+  font-size: 1.02rem;
+  font-weight: 850;
+}
+
+.segmented-choice {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  border: 2px solid #8ccdf0;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.segmented-choice label {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 54px;
+  border-right: 1px solid #cce8f7;
+  color: var(--blue-strong);
+  font-weight: 900;
+}
+
+.segmented-choice label:last-child {
+  border-right: 0;
+}
+
+.segmented-choice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.segmented-choice label:has(input:checked) {
+  background: var(--blue);
+  color: #ffffff;
+}
+
 .current-location-note {
   margin: 0;
   padding: 12px 14px;
@@ -510,6 +556,49 @@ h1:not(.home-title) {
 .schedule-controls {
   display: grid;
   gap: 18px;
+}
+
+.mood-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid #cce8f7;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff, var(--surface-blue));
+}
+
+.mood-card h2,
+.mood-buffer {
+  margin: 0;
+}
+
+.mood-card h2 {
+  color: var(--text);
+  font-size: 1.18rem;
+}
+
+.mood-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 0.94rem;
+  font-weight: 800;
+}
+
+.mood-slider {
+  width: 100%;
+  accent-color: var(--blue);
+}
+
+.mood-buffer {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.mood-buffer strong {
+  color: var(--warm-strong);
+  font-size: 1.35rem;
 }
 
 .buffer-card {
@@ -706,6 +795,10 @@ h1:not(.home-title) {
   padding: 10px 0;
 }
 
+.timeline--schedule .timeline-item {
+  grid-template-columns: 40px minmax(0, 1fr) 64px;
+}
+
 .timeline-check {
   position: relative;
   z-index: 1;
@@ -737,6 +830,12 @@ h1:not(.home-title) {
   background: #ffffff;
 }
 
+.timeline--schedule .timeline-body {
+  border: 0;
+  background: transparent;
+  padding: 8px 0;
+}
+
 .timeline-time {
   flex: 0 0 auto;
   color: var(--warm-strong);
@@ -750,6 +849,12 @@ h1:not(.home-title) {
   color: var(--text);
   font-size: clamp(1rem, 3.8vw, 1.18rem);
   font-weight: 850;
+}
+
+.timeline-item.is-completed .timeline-time,
+.timeline-item.is-completed .timeline-label {
+  color: #8aa0b2;
+  text-decoration: line-through;
 }
 
 .alarm-toggle {

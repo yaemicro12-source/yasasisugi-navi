@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>逆算の微調整 - Yasasisugi Navi</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="subpage">
+    <nav class="page-nav" aria-label="ページ移動">
+      <a href="goal.html">もくてきちへ</a>
+      <a href="schedule.html">スケジュールへ</a>
+    </nav>
+
+    <section id="schedule-setting-section" class="section-panel planner" aria-labelledby="setting-title">
+      <div class="section-heading">
+        <p class="eyebrow">微調整</p>
+        <h1 id="setting-title">逆算の微調整</h1>
+        <p>余裕の持ち方だけ決めます。</p>
+      </div>
+
+      <div class="schedule-controls">
+        <label class="field">
+          <span>何分前につきたい？</span>
+          <select id="arrival-buffer">
+            <option value="5">5分前</option>
+            <option value="10" selected>10分前</option>
+            <option value="15">15分前</option>
+            <option value="20">20分前</option>
+            <option value="30">30分前</option>
+          </select>
+        </label>
+
+        <section class="mood-card" aria-labelledby="mood-title">
+          <h2 id="mood-title">今日の気分</h2>
+          <div class="mood-labels" aria-hidden="true">
+            <span>遅刻しそう</span>
+            <span>時間通りにつけそう</span>
+          </div>
+          <input id="mood-slider" class="mood-slider" type="range" min="1" max="5" step="1" value="2" aria-label="今日の気分">
+          <p class="mood-buffer">予備時間 <strong id="buffer-minutes">25</strong> 分</p>
+        </section>
+      </div>
+
+      <div class="page-actions">
+        <button id="setting-decision-button" class="action-button" type="button">決定</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

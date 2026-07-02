@@ -21,6 +21,8 @@ const bufferDecrease = document.querySelector("#buffer-decrease");
 const bufferIncrease = document.querySelector("#buffer-increase");
 const bufferMinutesOutput = document.querySelector("#buffer-minutes");
 const arrivalComplete = document.querySelector("#arrival-complete");
+const moodSlider = document.querySelector("#mood-slider");
+const settingDecisionButton = document.querySelector("#setting-decision-button");
 
 const fields = {
   goalPlace: document.querySelector("#goal-place"),
@@ -127,7 +129,7 @@ function loadSavedPlan() {
   setStartType(savedValues.startType || "home", { shouldSave: false });
   setRecommendedBuffer(getSavedNumber("recommendedBufferMinutes", 25), { shouldSave: false });
   updateDateButtons(savedValues.arrivalDay || "today");
-  renderFinalSchedule();
+  renderScheduleTimeline();
 }
 
 function hasGoalPlace() {
@@ -135,7 +137,7 @@ function hasGoalPlace() {
 }
 
 function redirectScheduleWithoutGoal() {
-  if (finalSchedule && !hasGoalPlace()) {
+  if ((timeline || moodSlider) && !hasGoalPlace()) {
     window.location.replace("goal.html");
   }
 }
@@ -286,7 +288,7 @@ function openRouteSearch() {
   savePlan();
 
   const startSetting = getStartSetting();
-  const goalPlace = getValue("goalPlace", "川崎").trim() || "川崎";
+  const goalPlace = getValue("goalPlace", "渋谷").trim() || "渋谷";
   const query = `${startSetting.station} から ${goalPlace} 乗換 到着 ${getArrivalTimeText()}`;
   window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, "_blank", "noopener");
 }
@@ -342,7 +344,7 @@ function renderRouteResult() {
 
 function moveToSchedulePage() {
   savePlan();
-  window.location.href = "schedule.html";
+  window.location.href = "schedule-setting.html";
 }
 
 function setRecommendedBuffer(nextMinutes, options = {}) {
@@ -352,11 +354,33 @@ function setRecommendedBuffer(nextMinutes, options = {}) {
     bufferMinutesOutput.textContent = String(recommendedBufferMinutes);
   }
 
+  if (moodSlider) {
+    const moodValueByBuffer = {
+      30: "1",
+      25: "2",
+      20: "3",
+      15: "4",
+      5: "5"
+    };
+    moodSlider.value = moodValueByBuffer[recommendedBufferMinutes] || "2";
+  }
+
   if (options.shouldSave !== false) {
     savePlan();
   }
 
-  renderFinalSchedule();
+  renderScheduleTimeline();
+}
+
+function getBufferFromMood(moodValue) {
+  const buffers = {
+    1: 30,
+    2: 25,
+    3: 20,
+    4: 15,
+    5: 5
+  };
+  return buffers[Number(moodValue)] || 25;
 }
 
 function renderFinalSchedule() {
@@ -413,6 +437,38 @@ function clearPlanAndStartNew() {
   window.location.href = "goal.html";
 }
 
+function getRouteScheduleSteps() {
+  const startSetting = getStartSetting();
+  const arrivalTime = toMinutes(getArrivalTimeText());
+  const arrivalBuffer = Math.max(0, getNumberValue("arrivalBuffer", 10));
+  const targetArrival = arrivalTime - arrivalBuffer;
+  const stationArrival = targetArrival - Math.min(5, recommendedBufferMinutes);
+  const trainTime = targetArrival - recommendedBufferMinutes;
+  const leaveTime = trainTime - startSetting.stationMinutes;
+  const wakeTime = leaveTime - userRouteSettings.preparationMinutes;
+
+  return [
+    { id: "wake", time: wakeTime, label: "起きる" },
+    { id: "leave", time: leaveTime, label: `${startSetting.label}を出る` },
+    { id: "train", time: trainTime, label: `${formatTime(trainTime)}の電車に乗る` },
+    { id: "station", time: stationArrival, label: "駅到着" },
+    { id: "arrive", time: targetArrival, label: "目的地到着" }
+  ];
+}
+
+function renderScheduleTimeline() {
+  if (!timeline) {
+    return;
+  }
+
+  currentPlan = getRouteScheduleSteps();
+  if (output.summary) {
+    output.summary.textContent = `${getValue("destination", "目的地")}へ向かう予定です。`;
+  }
+
+  renderTimeline();
+}
+
 function calculatePlan() {
   if (!getAvailableFields().length && !Object.keys(savedValues).length) {
     updateNextReminder();
@@ -460,7 +516,7 @@ function calculatePlan() {
 
   updateNextReminder();
   renderTimeline();
-  renderFinalSchedule();
+  renderScheduleTimeline();
 }
 
 function updateClock() {
@@ -498,6 +554,7 @@ function renderTimeline() {
     const state = stepState[step.id];
     const item = document.createElement("article");
     item.className = "timeline-item";
+    item.classList.toggle("is-completed", state.completed);
     item.dataset.step = step.id;
 
     const checkbox = document.createElement("button");
@@ -633,6 +690,13 @@ if (calculateButton) {
   calculateButton.addEventListener("click", moveToSchedulePage);
 }
 
+if (settingDecisionButton) {
+  settingDecisionButton.addEventListener("click", () => {
+    savePlan();
+    window.location.href = "schedule.html";
+  });
+}
+
 if (bufferHelpButton && bufferHelp) {
   bufferHelpButton.addEventListener("click", () => {
     const nextHidden = !bufferHelp.hidden;
@@ -647,6 +711,12 @@ if (bufferDecrease) {
 
 if (bufferIncrease) {
   bufferIncrease.addEventListener("click", () => setRecommendedBuffer(recommendedBufferMinutes + 5));
+}
+
+if (moodSlider) {
+  moodSlider.addEventListener("input", () => {
+    setRecommendedBuffer(getBufferFromMood(moodSlider.value));
+  });
 }
 
 if (arrivalComplete) {
