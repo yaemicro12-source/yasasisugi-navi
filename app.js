@@ -114,6 +114,16 @@ function loadSavedPlan() {
   renderFinalSchedule();
 }
 
+function hasGoalPlace() {
+  return Boolean((savedValues.goalPlace || savedValues.destination || "").trim());
+}
+
+function redirectScheduleWithoutGoal() {
+  if (finalSchedule && !hasGoalPlace()) {
+    window.location.replace("goal.html");
+  }
+}
+
 function savePlan() {
   const nextPlan = { ...savedValues };
 
@@ -610,6 +620,7 @@ if (arrivalComplete) {
 }
 
 loadSavedPlan();
+redirectScheduleWithoutGoal();
 
 getAvailableFields().forEach((field) => {
   field.addEventListener("input", calculatePlan);
