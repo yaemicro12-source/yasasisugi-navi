@@ -27,6 +27,8 @@ const fields = {
   arrivalHour: document.querySelector("#arrival-hour"),
   arrivalMinute: document.querySelector("#arrival-minute"),
   trainTime: document.querySelector("#train-time"),
+  trainHour: document.querySelector("#train-hour"),
+  trainMinute: document.querySelector("#train-minute"),
   destination: document.querySelector("#destination"),
   startTime: document.querySelector("#start-time"),
   arrivalBuffer: document.querySelector("#arrival-buffer"),
@@ -108,6 +110,20 @@ function loadSavedPlan() {
     fields.startTime.value = `${savedValues.arrivalHour}:${savedValues.arrivalMinute}`;
   }
 
+  if (savedValues.trainTime) {
+    const [trainHour, trainMinute] = savedValues.trainTime.split(":");
+
+    if (fields.trainHour && trainHour) {
+      fields.trainHour.value = trainHour;
+    }
+
+    if (fields.trainMinute && trainMinute) {
+      fields.trainMinute.value = trainMinute;
+    }
+  }
+
+  syncTrainTime();
+
   setStartType(savedValues.startType || "home", { shouldSave: false });
   setRecommendedBuffer(getSavedNumber("recommendedBufferMinutes", 25), { shouldSave: false });
   updateDateButtons(savedValues.arrivalDay || "today");
@@ -139,6 +155,12 @@ function savePlan() {
 
   if (fields.arrivalHour && fields.arrivalMinute) {
     nextPlan.startTime = `${fields.arrivalHour.value}:${fields.arrivalMinute.value}`;
+  }
+
+  if (fields.trainHour && fields.trainMinute) {
+    nextPlan.trainTime = fields.trainHour.value && fields.trainMinute.value
+      ? `${fields.trainHour.value}:${fields.trainMinute.value}`
+      : "";
   }
 
   if (startHome || startWork || startCurrent) {
@@ -241,7 +263,23 @@ function getArrivalTimeText() {
 }
 
 function getTrainTimeText() {
+  if (fields.trainHour && fields.trainMinute) {
+    return fields.trainHour.value && fields.trainMinute.value
+      ? `${fields.trainHour.value}:${fields.trainMinute.value}`
+      : "";
+  }
+
   return fields.trainTime?.value || savedValues.trainTime || "";
+}
+
+function syncTrainTime() {
+  if (!fields.trainTime || !fields.trainHour || !fields.trainMinute) {
+    return;
+  }
+
+  fields.trainTime.value = fields.trainHour.value && fields.trainMinute.value
+    ? `${fields.trainHour.value}:${fields.trainMinute.value}`
+    : "";
 }
 
 function openRouteSearch() {
@@ -624,7 +662,10 @@ redirectScheduleWithoutGoal();
 
 getAvailableFields().forEach((field) => {
   field.addEventListener("input", calculatePlan);
-  field.addEventListener("change", calculatePlan);
+  field.addEventListener("change", () => {
+    syncTrainTime();
+    calculatePlan();
+  });
 });
 
 updateClock();
