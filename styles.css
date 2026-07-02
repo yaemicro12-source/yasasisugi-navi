@@ -92,7 +92,7 @@ p {
 .current-time {
   display: block;
   color: var(--blue-strong);
-  font-size: clamp(8.4rem, 44vw, 24rem);
+  font-size: clamp(5.9rem, 31vw, 16.8rem);
   font-weight: 900;
   line-height: 0.82;
   letter-spacing: 0;
