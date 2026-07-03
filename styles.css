@@ -231,7 +231,7 @@ h1:not(.home-title) {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(6px, 2.4vw, 12px);
-  margin-top: 24px;
+  margin-top: 10px;
 }
 
 .action-button {
