@@ -93,12 +93,27 @@ const stepState = {
 
 let currentPlan = [];
 
+function serializeStepState() {
+  return Object.fromEntries(
+    Object.entries(stepState).map(([id, state]) => [id, { ...state }])
+  );
+}
+
+function restoreStepState(nextStepState = {}) {
+  Object.entries(nextStepState).forEach(([id, state]) => {
+    if (stepState[id]) {
+      stepState[id] = { ...stepState[id], ...state };
+    }
+  });
+}
+
 function getAvailableFields() {
   return Object.values(fields).filter(Boolean);
 }
 
 function loadSavedPlan() {
   savedValues = JSON.parse(localStorage.getItem(storageKey) || "{}");
+  restoreStepState(savedValues.stepState);
 
   Object.entries(fields).forEach(([key, field]) => {
     if (field && savedValues[key] !== undefined) {
@@ -174,6 +189,8 @@ function savePlan() {
   if (bufferMinutesOutput) {
     nextPlan.recommendedBufferMinutes = recommendedBufferMinutes;
   }
+
+  nextPlan.stepState = serializeStepState();
 
   savedValues = nextPlan;
   localStorage.setItem(storageKey, JSON.stringify(nextPlan));
@@ -545,12 +562,17 @@ function updateNextReminder() {
     return;
   }
 
-  if (!currentPlan.length) {
+  const reminderPlan = hasGoalPlace() ? getRouteScheduleSteps() : currentPlan;
+  const nextStep = reminderPlan
+    .filter((step) => !stepState[step.id]?.completed)
+    .sort((first, second) => first.time - second.time)[0];
+
+  if (!nextStep) {
     nextReminderOutput.textContent = "最初の予定の5分前 --:--";
     return;
   }
 
-  nextReminderOutput.textContent = `最初の予定の5分前 ${formatTime(currentPlan[0].time - 5)}`;
+  nextReminderOutput.textContent = `最初の予定の5分前 ${formatTime(nextStep.time - 5)}`;
 }
 
 function renderTimeline() {
@@ -604,6 +626,7 @@ function renderTimeline() {
 
 function toggleComplete(stepId) {
   stepState[stepId].completed = !stepState[stepId].completed;
+  savePlan();
 
   if (!navigatorMessage) {
     renderTimeline();
@@ -621,6 +644,7 @@ function toggleComplete(stepId) {
 
 function toggleAlarm(stepId) {
   stepState[stepId].alarm = !stepState[stepId].alarm;
+  savePlan();
   renderTimeline();
 }
 
