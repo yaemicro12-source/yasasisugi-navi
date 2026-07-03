@@ -144,8 +144,8 @@ p {
 .character-slot {
   display: grid;
   place-items: center;
-  width: min(44vw, 210px);
-  min-width: 150px;
+  width: min(58vw, 260px);
+  min-width: 180px;
   aspect-ratio: 1;
 }
 
@@ -154,7 +154,7 @@ p {
   width: 100%;
   max-width: 100%;
   height: auto;
-  max-height: min(34vh, 230px);
+  max-height: min(38vh, 280px);
   object-fit: contain;
   transform-origin: 50% 82%;
   animation: slime-idle 3.4s ease-in-out infinite;
