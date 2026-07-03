@@ -155,6 +155,26 @@ p {
   box-shadow: 0 22px 48px rgba(18, 94, 170, 0.2);
 }
 
+.cat-slime {
+  display: block;
+  width: min(40vw, 190px);
+  max-width: 88%;
+  height: auto;
+  max-height: min(30vh, 210px);
+  object-fit: contain;
+  transform-origin: 50% 82%;
+  animation: slime-idle 3.4s ease-in-out infinite;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-drag: none;
+  will-change: transform;
+}
+
+.cat-slime:active {
+  animation: slime-puni 260ms cubic-bezier(0.18, 0.86, 0.36, 1) both;
+}
+
 .character-placeholder {
   display: grid;
   place-items: center;
@@ -165,6 +185,45 @@ p {
   color: #2f719d;
   font-weight: 850;
   background: rgba(255, 255, 255, 0.72);
+}
+
+@keyframes slime-idle {
+  0% {
+    transform: translateY(0) rotate(-1deg) scale(1.01, 0.99);
+  }
+  25% {
+    transform: translateY(-5px) rotate(2deg) scale(0.985, 1.025);
+  }
+  50% {
+    transform: translateY(-2px) rotate(-2deg) scale(1.025, 0.98);
+  }
+  75% {
+    transform: translateY(-6px) rotate(1.5deg) scale(0.99, 1.02);
+  }
+  100% {
+    transform: translateY(0) rotate(-1deg) scale(1.01, 0.99);
+  }
+}
+
+@keyframes slime-puni {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  42% {
+    transform: translateY(4px) scale(1.08, 0.88);
+  }
+  72% {
+    transform: translateY(-3px) scale(0.96, 1.06);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-slime {
+    animation: none;
+  }
 }
 
 h1:not(.home-title) {
