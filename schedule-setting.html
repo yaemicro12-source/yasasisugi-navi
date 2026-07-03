@@ -38,13 +38,19 @@
             <span>遅刻しそう</span>
             <span>時間通りにつけそう</span>
           </div>
-          <input id="mood-slider" class="mood-slider" type="range" min="1" max="5" step="1" value="2" aria-label="今日の気分">
+          <div id="mood-options" class="mood-options" role="radiogroup" aria-label="今日の気分">
+            <button class="mood-option" type="button" data-buffer="30" aria-label="予備時間30分"></button>
+            <button class="mood-option is-selected" type="button" data-buffer="25" aria-label="予備時間25分"></button>
+            <button class="mood-option" type="button" data-buffer="20" aria-label="予備時間20分"></button>
+            <button class="mood-option" type="button" data-buffer="15" aria-label="予備時間15分"></button>
+            <button class="mood-option" type="button" data-buffer="5" aria-label="予備時間5分"></button>
+          </div>
           <p class="mood-buffer">予備時間 <strong id="buffer-minutes">25</strong> 分</p>
         </section>
       </div>
 
       <div class="page-actions">
-        <button id="setting-decision-button" class="action-button" type="button">決定</button>
+        <button id="setting-decision-button" class="action-button" type="button">調整する</button>
       </div>
     </section>
   </main>

@@ -22,6 +22,7 @@ const bufferIncrease = document.querySelector("#buffer-increase");
 const bufferMinutesOutput = document.querySelector("#buffer-minutes");
 const arrivalComplete = document.querySelector("#arrival-complete");
 const moodSlider = document.querySelector("#mood-slider");
+const moodOptions = document.querySelectorAll(".mood-option");
 const settingDecisionButton = document.querySelector("#setting-decision-button");
 
 const fields = {
@@ -31,6 +32,7 @@ const fields = {
   trainTime: document.querySelector("#train-time"),
   trainHour: document.querySelector("#train-hour"),
   trainMinute: document.querySelector("#train-minute"),
+  trainDuration: document.querySelector("#train-duration"),
   destination: document.querySelector("#destination"),
   startTime: document.querySelector("#start-time"),
   arrivalBuffer: document.querySelector("#arrival-buffer"),
@@ -137,7 +139,7 @@ function hasGoalPlace() {
 }
 
 function redirectScheduleWithoutGoal() {
-  if ((timeline || moodSlider) && !hasGoalPlace()) {
+  if ((timeline || moodSlider || moodOptions.length || settingDecisionButton) && !hasGoalPlace()) {
     window.location.replace("goal.html");
   }
 }
@@ -365,6 +367,11 @@ function setRecommendedBuffer(nextMinutes, options = {}) {
     moodSlider.value = moodValueByBuffer[recommendedBufferMinutes] || "2";
   }
 
+  moodOptions.forEach((option) => {
+    option.classList.toggle("is-selected", Number(option.dataset.buffer) === recommendedBufferMinutes);
+    option.setAttribute("aria-checked", String(Number(option.dataset.buffer) === recommendedBufferMinutes));
+  });
+
   if (options.shouldSave !== false) {
     savePlan();
   }
@@ -442,17 +449,20 @@ function getRouteScheduleSteps() {
   const arrivalTime = toMinutes(getArrivalTimeText());
   const arrivalBuffer = Math.max(0, getNumberValue("arrivalBuffer", 10));
   const targetArrival = arrivalTime - arrivalBuffer;
-  const stationArrival = targetArrival - Math.min(5, recommendedBufferMinutes);
-  const trainTime = targetArrival - recommendedBufferMinutes;
-  const leaveTime = trainTime - startSetting.stationMinutes;
+  const savedTrainTime = getTrainTimeText();
+  const trainTime = savedTrainTime ? toMinutes(savedTrainTime) : targetArrival - recommendedBufferMinutes;
+  const trainDuration = Math.max(1, getNumberValue("trainDuration", 1));
+  const trainExitTime = trainTime + trainDuration;
+  const destinationArrival = Math.max(trainExitTime, targetArrival);
+  const leaveTime = trainTime - startSetting.stationMinutes - recommendedBufferMinutes;
   const wakeTime = leaveTime - userRouteSettings.preparationMinutes;
 
   return [
     { id: "wake", time: wakeTime, label: "起きる" },
     { id: "leave", time: leaveTime, label: `${startSetting.label}を出る` },
-    { id: "train", time: trainTime, label: `${formatTime(trainTime)}の電車に乗る` },
-    { id: "station", time: stationArrival, label: "駅到着" },
-    { id: "arrive", time: targetArrival, label: "目的地到着" }
+    { id: "train", time: trainTime, label: "電車に乗る" },
+    { id: "station", time: trainExitTime, label: "電車を降りる" },
+    { id: "arrive", time: destinationArrival, label: "目的地到着" }
   ];
 }
 
@@ -718,6 +728,12 @@ if (moodSlider) {
     setRecommendedBuffer(getBufferFromMood(moodSlider.value));
   });
 }
+
+moodOptions.forEach((option) => {
+  option.addEventListener("click", () => {
+    setRecommendedBuffer(Number(option.dataset.buffer));
+  });
+});
 
 if (arrivalComplete) {
   arrivalComplete.addEventListener("change", () => {
