@@ -3,6 +3,7 @@ const lostGuide = document.querySelector("#lost-guide");
 const currentTimeOutput = document.querySelector("#current-time");
 const nextReminderOutput = document.querySelector("#next-reminder");
 const navigatorMessage = document.querySelector("#navigator-message");
+const catSlime = document.querySelector(".cat-slime");
 const timeline = document.querySelector("#timeline");
 const achievementPercent = document.querySelector("#achievement-percent");
 const achievementBlocks = document.querySelector("#achievement-blocks");
@@ -92,6 +93,98 @@ const stepState = {
 };
 
 let currentPlan = [];
+let catSlimeIdleTimerId;
+let catSlimeSleepTimerId;
+let catSlimeHappyTimerId;
+let catSlimeSleepClockId;
+let catSlimeIsHappy = false;
+
+function isAfterSleepTime() {
+  return new Date().getHours() >= 22;
+}
+
+function setCatSlimeImage(src) {
+  if (!catSlime || catSlime.getAttribute("src") === src) {
+    return;
+  }
+
+  catSlime.setAttribute("src", src);
+}
+
+function setCatSlimeRestingImage() {
+  setCatSlimeImage(isAfterSleepTime() ? "sleep.png" : "nomal.png");
+}
+
+function scheduleCatSlimeIdleImages() {
+  if (!catSlime) {
+    return;
+  }
+
+  window.clearTimeout(catSlimeIdleTimerId);
+  window.clearTimeout(catSlimeSleepTimerId);
+
+  catSlimeIdleTimerId = window.setTimeout(() => {
+    setCatSlimeImage("utatane1.png");
+  }, 60000);
+
+  catSlimeSleepTimerId = window.setTimeout(() => {
+    setCatSlimeImage("sleep.png");
+  }, 300000);
+}
+
+function resetCatSlimeState() {
+  if (!catSlime) {
+    return;
+  }
+
+  window.clearTimeout(catSlimeHappyTimerId);
+  setCatSlimeRestingImage();
+  scheduleCatSlimeIdleImages();
+}
+
+function showCatSlimeHappy() {
+  if (!catSlime) {
+    return;
+  }
+
+  catSlimeIsHappy = true;
+  window.clearTimeout(catSlimeHappyTimerId);
+  window.clearTimeout(catSlimeIdleTimerId);
+  window.clearTimeout(catSlimeSleepTimerId);
+  setCatSlimeImage("happy.png");
+
+  catSlimeHappyTimerId = window.setTimeout(() => {
+    catSlimeIsHappy = false;
+    setCatSlimeImage("nomal.png");
+    scheduleCatSlimeIdleImages();
+  }, 500);
+}
+
+function watchCatSlimeSleepTime() {
+  if (!catSlime || catSlimeSleepClockId) {
+    return;
+  }
+
+  catSlimeSleepClockId = window.setInterval(() => {
+    if (isAfterSleepTime() && !catSlimeIsHappy) {
+      setCatSlimeImage("sleep.png");
+    }
+  }, 60000);
+}
+
+function initializeCatSlimeIdleState() {
+  if (!catSlime) {
+    return;
+  }
+
+  ["keydown", "scroll", "mousemove"].forEach((eventName) => {
+    window.addEventListener(eventName, resetCatSlimeState, { passive: true });
+  });
+
+  window.addEventListener("pointerdown", showCatSlimeHappy, { passive: true });
+  resetCatSlimeState();
+  watchCatSlimeSleepTime();
+}
 
 function serializeStepState() {
   return Object.fromEntries(
@@ -774,6 +867,7 @@ if (arrivalComplete) {
 
 loadSavedPlan();
 redirectScheduleWithoutGoal();
+initializeCatSlimeIdleState();
 
 getAvailableFields().forEach((field) => {
   field.addEventListener("input", calculatePlan);
