@@ -259,6 +259,11 @@ h1:not(.home-title) {
   margin-top: 22px;
 }
 
+.page-actions--split {
+  display: grid;
+  gap: 18px;
+}
+
 .lost-guide {
   width: 100%;
   text-align: left;
