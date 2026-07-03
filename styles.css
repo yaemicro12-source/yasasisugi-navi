@@ -137,7 +137,7 @@ p {
 
 .speech p {
   margin: 0;
-  font-size: clamp(1.05rem, 3.6vw, 1.35rem);
+  font-size: clamp(0.95rem, 3.2vw, 1.18rem);
   font-weight: 850;
 }
 
@@ -147,20 +147,14 @@ p {
   width: min(44vw, 210px);
   min-width: 150px;
   aspect-ratio: 1;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 34% 24%, #ffffff 0 16%, transparent 17%),
-    linear-gradient(145deg, #ffffff 0%, #d8f3ff 100%);
-  border: 5px solid #70bfe8;
-  box-shadow: 0 22px 48px rgba(18, 94, 170, 0.2);
 }
 
 .cat-slime {
   display: block;
-  width: min(40vw, 190px);
-  max-width: 88%;
+  width: 100%;
+  max-width: 100%;
   height: auto;
-  max-height: min(30vh, 210px);
+  max-height: min(34vh, 230px);
   object-fit: contain;
   transform-origin: 50% 82%;
   animation: slime-idle 3.4s ease-in-out infinite;
