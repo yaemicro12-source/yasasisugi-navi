@@ -98,9 +98,11 @@ let catSlimeSleepTimerId;
 let catSlimeHappyTimerId;
 let catSlimeSleepClockId;
 let catSlimeIsHappy = false;
+let catSlimeLastInteractionAt = Date.now();
 
-function isAfterSleepTime() {
-  return new Date().getHours() >= 22;
+function isCatSlimeSleepTime() {
+  const hour = new Date().getHours();
+  return hour >= 22 || hour < 5;
 }
 
 function setCatSlimeImage(src) {
@@ -112,7 +114,7 @@ function setCatSlimeImage(src) {
 }
 
 function setCatSlimeRestingImage() {
-  setCatSlimeImage(isAfterSleepTime() ? "sleep.png" : "nomal.png");
+  setCatSlimeImage("nomal.png");
 }
 
 function scheduleCatSlimeIdleImages() {
@@ -137,7 +139,9 @@ function resetCatSlimeState() {
     return;
   }
 
+  catSlimeLastInteractionAt = Date.now();
   window.clearTimeout(catSlimeHappyTimerId);
+  catSlimeIsHappy = false;
   setCatSlimeRestingImage();
   scheduleCatSlimeIdleImages();
 }
@@ -148,6 +152,7 @@ function showCatSlimeHappy() {
   }
 
   catSlimeIsHappy = true;
+  catSlimeLastInteractionAt = Date.now();
   window.clearTimeout(catSlimeHappyTimerId);
   window.clearTimeout(catSlimeIdleTimerId);
   window.clearTimeout(catSlimeSleepTimerId);
@@ -166,7 +171,8 @@ function watchCatSlimeSleepTime() {
   }
 
   catSlimeSleepClockId = window.setInterval(() => {
-    if (isAfterSleepTime() && !catSlimeIsHappy) {
+    const idleMilliseconds = Date.now() - catSlimeLastInteractionAt;
+    if (isCatSlimeSleepTime() && idleMilliseconds >= 300000 && !catSlimeIsHappy) {
       setCatSlimeImage("sleep.png");
     }
   }, 60000);
