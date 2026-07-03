@@ -562,7 +562,12 @@ function updateNextReminder() {
     return;
   }
 
-  const reminderPlan = hasGoalPlace() ? getRouteScheduleSteps() : currentPlan;
+  if (!hasGoalPlace()) {
+    nextReminderOutput.textContent = "もくてきちから予定を入力しよう";
+    return;
+  }
+
+  const reminderPlan = getRouteScheduleSteps();
   const nextStep = reminderPlan
     .filter((step) => !stepState[step.id]?.completed)
     .sort((first, second) => first.time - second.time)[0];
