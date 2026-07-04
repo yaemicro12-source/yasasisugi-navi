@@ -319,7 +319,13 @@ function appendChatBubble(text, type = "slime") {
   goalChatLog.append(bubble);
 }
 
-function appendTrainTimeQuestionBubble(question) {
+function clearGoalChatLog() {
+  if (goalChatLog) {
+    goalChatLog.replaceChildren();
+  }
+}
+
+function appendTrainTimeQuestionBubble(question, prefix = "") {
   if (!goalChatLog) {
     return;
   }
@@ -333,7 +339,7 @@ function appendTrainTimeQuestionBubble(question) {
   const routeLink = document.createElement("a");
 
   bubble.className = "chat-bubble chat-bubble--slime";
-  questionText.textContent = question;
+  questionText.textContent = prefix ? `${prefix}\n${question}` : question;
   routeLink.className = "chat-route-link";
   routeLink.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
   routeLink.target = "_blank";
@@ -382,9 +388,17 @@ function appendGoalChatMoodBubble() {
   }
 
   const bubble = document.createElement("div");
+  const moodWrap = document.createElement("div");
   const buttonGroup = document.createElement("div");
+  const leftLabel = document.createElement("span");
+  const rightLabel = document.createElement("span");
 
   bubble.className = "chat-bubble chat-bubble--slime chat-action-bubble";
+  moodWrap.className = "chat-mood-wrap";
+  leftLabel.className = "chat-mood-label";
+  rightLabel.className = "chat-mood-label";
+  leftLabel.textContent = "不安";
+  rightLabel.textContent = "ばっちり！";
   buttonGroup.className = "chat-mood-options";
 
   moodBufferChoices.forEach((minutes) => {
@@ -396,22 +410,39 @@ function appendGoalChatMoodBubble() {
     buttonGroup.append(button);
   });
 
-  bubble.append(buttonGroup);
+  moodWrap.append(leftLabel, buttonGroup, rightLabel);
+  bubble.append(moodWrap);
   goalChatLog.append(bubble);
 }
 
-function askCurrentGoalQuestion() {
+function getGoalChatCurrentValueText(key) {
+  const values = {
+    destination: goalChatAnswers.destination,
+    arrivalTime: goalChatAnswers.arrivalTime,
+    trainTime: goalChatAnswers.trainTime,
+    trainDuration: goalChatAnswers.trainDuration ? `${goalChatAnswers.trainDuration}分` : "",
+    arrivalBuffer: goalChatAnswers.arrivalBuffer ? `${goalChatAnswers.arrivalBuffer}分前` : "",
+    recommendedBufferMinutes: `${goalChatAnswers.recommendedBufferMinutes ?? recommendedBufferMinutes}分`
+  };
+
+  return values[key] || "未入力";
+}
+
+function askCurrentGoalQuestion(options = {}) {
   const step = goalChatSteps[currentGoalChatStep];
+  const prefix = options.prefix || "";
 
   if (!step) {
     showGoalChatArrivalBufferQuestion();
     return;
   }
 
+  clearGoalChatLog();
+
   if (step.key === "trainTime") {
-    appendTrainTimeQuestionBubble(step.question);
+    appendTrainTimeQuestionBubble(step.question, prefix);
   } else {
-    appendChatBubble(step.question, "slime");
+    appendChatBubble(prefix ? `${prefix}\n${step.question}` : step.question, "slime");
   }
 
   if (goalChatInput) {
@@ -422,15 +453,13 @@ function askCurrentGoalQuestion() {
 }
 
 function showGoalChatArrivalBufferQuestion() {
-  removeGoalChatActionBubbles();
+  clearGoalChatLog();
   appendChatBubble("何分前につきたい？", "slime");
   appendGoalChatButtonBubble(
     arrivalBufferChoices.map((minutes) => ({
       label: `${minutes}分前`,
       onClick: () => {
-        removeGoalChatActionBubbles();
         goalChatAnswers.arrivalBuffer = minutes;
-        appendChatBubble(`${minutes}分前`, "user");
         showGoalChatMoodQuestion();
       }
     }))
@@ -442,21 +471,21 @@ function showGoalChatArrivalBufferQuestion() {
 }
 
 function showGoalChatMoodQuestion() {
-  appendChatBubble("今日の気分", "slime");
+  clearGoalChatLog();
+  appendChatBubble("じかん通りにつけそう？", "slime");
   appendGoalChatMoodBubble();
 }
 
 function selectGoalChatBuffer(minutes) {
-  removeGoalChatActionBubbles();
   goalChatAnswers.recommendedBufferMinutes = minutes;
   recommendedBufferMinutes = minutes;
-  appendChatBubble(`予備時間：${minutes}分`, "user");
   showGoalChatBufferConfirmation();
 }
 
 function showGoalChatBufferConfirmation() {
   const minutes = goalChatAnswers.recommendedBufferMinutes ?? recommendedBufferMinutes;
 
+  clearGoalChatLog();
   appendChatBubble(`予備時間：${minutes}分の余裕をもってスケジュールをたてていいかな？`, "slime");
   appendGoalChatButtonBubble([
     {
@@ -472,19 +501,19 @@ function showGoalChatBufferConfirmation() {
 }
 
 function showGoalChatChangeChoices() {
-  removeGoalChatActionBubbles();
+  clearGoalChatLog();
   appendChatBubble("どこを変更する？", "slime");
   appendGoalChatButtonBubble([
-    { label: "もくてきち", onClick: () => editGoalChatAnswer("destination") },
-    { label: "到着じかん", onClick: () => editGoalChatAnswer("arrivalTime") },
-    { label: "電車にのる時間", onClick: () => editGoalChatAnswer("trainTime") },
-    { label: "電車での移動時間", onClick: () => editGoalChatAnswer("trainDuration") },
-    { label: "予備時間", onClick: showGoalChatBufferChoices }
+    { label: `もくてきち：${getGoalChatCurrentValueText("destination")}`, onClick: () => editGoalChatAnswer("destination") },
+    { label: `到着じかん：${getGoalChatCurrentValueText("arrivalTime")}`, onClick: () => editGoalChatAnswer("arrivalTime") },
+    { label: `電車にのる時間：${getGoalChatCurrentValueText("trainTime")}`, onClick: () => editGoalChatAnswer("trainTime") },
+    { label: `電車での移動時間：${getGoalChatCurrentValueText("trainDuration")}`, onClick: () => editGoalChatAnswer("trainDuration") },
+    { label: `予備時間：${getGoalChatCurrentValueText("recommendedBufferMinutes")}`, onClick: showGoalChatBufferChoices }
   ]);
 }
 
 function showGoalChatBufferChoices() {
-  removeGoalChatActionBubbles();
+  clearGoalChatLog();
   appendChatBubble("予備時間を選んでね", "slime");
   appendGoalChatButtonBubble(
     customBufferChoices.map((minutes) => ({
@@ -537,7 +566,6 @@ function editGoalChatAnswer(key) {
     return;
   }
 
-  removeGoalChatActionBubbles();
   goalChatEditKey = key;
   currentGoalChatStep = stepIndex;
 
@@ -545,7 +573,9 @@ function editGoalChatAnswer(key) {
     goalChatForm.hidden = false;
   }
 
-  askCurrentGoalQuestion();
+  askCurrentGoalQuestion({
+    prefix: `今は「${getGoalChatCurrentValueText(key)}」だよ`
+  });
 }
 
 function resetGoalChat() {
@@ -584,23 +614,24 @@ function initializeGoalChat() {
     const result = step.validate(inputValue);
 
     if (result.error) {
-      appendChatBubble(result.error, "slime");
-      askCurrentGoalQuestion();
+      askCurrentGoalQuestion({ prefix: result.error });
       return;
     }
 
     if (step.key === "trainTime" && toMinutes(result.value) >= toMinutes(goalChatAnswers.arrivalTime)) {
-      appendChatBubble("到着時間より早い時間を入力してね", "slime");
-      askCurrentGoalQuestion();
+      askCurrentGoalQuestion({ prefix: "到着時間より早い時間を入力してね" });
       return;
     }
 
-    appendChatBubble(inputValue.trim(), "user");
     goalChatAnswers[step.key] = result.value;
 
     if (goalChatEditKey) {
       goalChatEditKey = "";
-      showGoalChatArrivalBufferQuestion();
+      if (goalChatAnswers.recommendedBufferMinutes !== undefined) {
+        showGoalChatBufferConfirmation();
+      } else {
+        showGoalChatArrivalBufferQuestion();
+      }
       return;
     }
 

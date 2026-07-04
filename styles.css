@@ -534,6 +534,7 @@ h1:not(.home-title) {
   font-size: 0.95rem;
   font-weight: 900;
   line-height: 1.2;
+  white-space: normal;
 }
 
 .chat-choice-button--secondary {
@@ -542,13 +543,27 @@ h1:not(.home-title) {
   border-color: #8ccdf0;
 }
 
+.chat-mood-wrap {
+  display: grid;
+  grid-template-columns: auto minmax(150px, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.chat-mood-label {
+  color: var(--blue-strong);
+  font-size: 0.86rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
 .chat-mood-options {
   position: relative;
   display: grid;
   grid-template-columns: repeat(5, minmax(28px, 1fr));
   gap: 8px;
   align-items: center;
-  min-width: min(68vw, 280px);
+  min-width: min(50vw, 230px);
   padding: 10px 0;
 }
 
