@@ -486,6 +486,10 @@ function showGoalChatBufferConfirmation() {
   const minutes = goalChatAnswers.recommendedBufferMinutes ?? recommendedBufferMinutes;
 
   clearGoalChatLog();
+  appendChatBubble(
+    `入力内容を確認してね\nもくてきち：${getGoalChatCurrentValueText("destination")}\n到着じかん：${getGoalChatCurrentValueText("arrivalTime")}\n電車にのる時間：${getGoalChatCurrentValueText("trainTime")}\n電車での移動時間：${getGoalChatCurrentValueText("trainDuration")}\n何分前につく：${getGoalChatCurrentValueText("arrivalBuffer")}\n予備時間：${minutes}分`,
+    "slime"
+  );
   appendChatBubble(`予備時間：${minutes}分の余裕をもってスケジュールをたてていいかな？`, "slime");
   appendGoalChatButtonBubble([
     {
@@ -608,6 +612,7 @@ function initializeGoalChat() {
 
   goalChatForm.addEventListener("submit", (event) => {
     event.preventDefault();
+    showCatSlimeHappy();
 
     const step = goalChatSteps[currentGoalChatStep];
     const inputValue = goalChatInput.value;
