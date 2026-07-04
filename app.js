@@ -314,6 +314,31 @@ function appendChatBubble(text, type = "slime") {
   goalChatLog.append(bubble);
 }
 
+function appendTrainTimeQuestionBubble(question) {
+  if (!goalChatLog) {
+    return;
+  }
+
+  const startSetting = getStartSetting();
+  const destination = goalChatAnswers.destination || "目的地";
+  const arrivalTime = goalChatAnswers.arrivalTime || "10:00";
+  const query = `${startSetting.station} から ${destination} 乗換 到着 ${arrivalTime}`;
+  const bubble = document.createElement("div");
+  const questionText = document.createElement("span");
+  const routeLink = document.createElement("a");
+
+  bubble.className = "chat-bubble chat-bubble--slime";
+  questionText.textContent = question;
+  routeLink.className = "chat-route-link";
+  routeLink.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+  routeLink.target = "_blank";
+  routeLink.rel = "noopener";
+  routeLink.textContent = "乗換案内で調べる";
+
+  bubble.append(questionText, document.createElement("br"), routeLink);
+  goalChatLog.append(bubble);
+}
+
 function askCurrentGoalQuestion() {
   const step = goalChatSteps[currentGoalChatStep];
 
@@ -322,7 +347,11 @@ function askCurrentGoalQuestion() {
     return;
   }
 
-  appendChatBubble(step.question, "slime");
+  if (step.key === "trainTime") {
+    appendTrainTimeQuestionBubble(step.question);
+  } else {
+    appendChatBubble(step.question, "slime");
+  }
 
   if (goalChatInput) {
     goalChatInput.value = "";

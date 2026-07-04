@@ -508,6 +508,15 @@ h1:not(.home-title) {
   transform: rotate(45deg);
 }
 
+.chat-route-link {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--blue-strong);
+  font-weight: 900;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .chat-input-area {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
