@@ -99,6 +99,7 @@ const stepState = {
 let currentPlan = [];
 let currentGoalChatStep = 0;
 let goalChatAnswers = {};
+let goalChatEditKey = "";
 let catSlimeIdleTimerId;
 let catSlimeSleepTimerId;
 let catSlimeHappyTimerId;
@@ -339,6 +340,38 @@ function appendTrainTimeQuestionBubble(question) {
   goalChatLog.append(bubble);
 }
 
+function removeGoalChatActionBubbles() {
+  if (!goalChatLog) {
+    return;
+  }
+
+  goalChatLog.querySelectorAll(".chat-action-bubble").forEach((bubble) => bubble.remove());
+}
+
+function appendGoalChatButtonBubble(buttons) {
+  if (!goalChatLog) {
+    return;
+  }
+
+  const bubble = document.createElement("div");
+  const buttonGroup = document.createElement("div");
+
+  bubble.className = "chat-bubble chat-bubble--slime chat-action-bubble";
+  buttonGroup.className = "chat-button-row";
+
+  buttons.forEach(({ label, onClick, variant = "primary" }) => {
+    const button = document.createElement("button");
+    button.className = `chat-choice-button chat-choice-button--${variant}`;
+    button.type = "button";
+    button.textContent = label;
+    button.addEventListener("click", onClick);
+    buttonGroup.append(button);
+  });
+
+  bubble.append(buttonGroup);
+  goalChatLog.append(bubble);
+}
+
 function askCurrentGoalQuestion() {
   const step = goalChatSteps[currentGoalChatStep];
 
@@ -385,6 +418,7 @@ function applyGoalChatAnswersToFields() {
 }
 
 function showGoalChatConfirmation() {
+  removeGoalChatActionBubbles();
   appendChatBubble("ありがとう！この内容で予定を作るね", "slime");
   appendChatBubble(
     `行き先：${goalChatAnswers.destination}\n到着したい時刻：${goalChatAnswers.arrivalTime}\n電車に乗る時刻：${goalChatAnswers.trainTime}\n電車での移動時間：${goalChatAnswers.trainDuration}分`,
@@ -395,35 +429,56 @@ function showGoalChatConfirmation() {
     goalChatForm.hidden = true;
   }
 
-  if (!goalChatActions) {
+  appendGoalChatButtonBubble([
+    {
+      label: "予定を作る",
+      onClick: () => {
+        applyGoalChatAnswersToFields();
+        savePlan();
+        window.location.href = "schedule-setting.html";
+      }
+    },
+    {
+      label: "なおす",
+      variant: "secondary",
+      onClick: showGoalChatFixChoices
+    }
+  ]);
+}
+
+function showGoalChatFixChoices() {
+  removeGoalChatActionBubbles();
+  appendChatBubble("どこを直す？", "slime");
+  appendGoalChatButtonBubble([
+    { label: "もくてきち", onClick: () => editGoalChatAnswer("destination") },
+    { label: "到着じかん", onClick: () => editGoalChatAnswer("arrivalTime") },
+    { label: "電車にのる時間", onClick: () => editGoalChatAnswer("trainTime") },
+    { label: "電車での移動時間", onClick: () => editGoalChatAnswer("trainDuration") }
+  ]);
+}
+
+function editGoalChatAnswer(key) {
+  const stepIndex = goalChatSteps.findIndex((step) => step.key === key);
+
+  if (stepIndex < 0) {
     return;
   }
 
-  goalChatActions.hidden = false;
-  goalChatActions.replaceChildren();
+  removeGoalChatActionBubbles();
+  goalChatEditKey = key;
+  currentGoalChatStep = stepIndex;
 
-  const createButton = document.createElement("button");
-  createButton.className = "action-button";
-  createButton.type = "button";
-  createButton.textContent = "予定を作る";
-  createButton.addEventListener("click", () => {
-    applyGoalChatAnswersToFields();
-    savePlan();
-    window.location.href = "schedule-setting.html";
-  });
+  if (goalChatForm) {
+    goalChatForm.hidden = false;
+  }
 
-  const restartButton = document.createElement("button");
-  restartButton.className = "secondary-action";
-  restartButton.type = "button";
-  restartButton.textContent = "なおす";
-  restartButton.addEventListener("click", resetGoalChat);
-
-  goalChatActions.append(createButton, restartButton);
+  askCurrentGoalQuestion();
 }
 
 function resetGoalChat() {
   currentGoalChatStep = 0;
   goalChatAnswers = {};
+  goalChatEditKey = "";
 
   if (goalChatLog) {
     goalChatLog.replaceChildren();
@@ -455,11 +510,25 @@ function initializeGoalChat() {
 
     if (result.error) {
       appendChatBubble(result.error, "slime");
+      askCurrentGoalQuestion();
+      return;
+    }
+
+    if (step.key === "trainTime" && toMinutes(result.value) >= toMinutes(goalChatAnswers.arrivalTime)) {
+      appendChatBubble("到着時間より早い時間を入力してね", "slime");
+      askCurrentGoalQuestion();
       return;
     }
 
     appendChatBubble(inputValue.trim(), "user");
     goalChatAnswers[step.key] = result.value;
+
+    if (goalChatEditKey) {
+      goalChatEditKey = "";
+      showGoalChatConfirmation();
+      return;
+    }
+
     currentGoalChatStep += 1;
     askCurrentGoalQuestion();
   });

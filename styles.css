@@ -518,6 +518,30 @@ h1:not(.home-title) {
   text-underline-offset: 3px;
 }
 
+.chat-button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chat-choice-button {
+  min-height: 42px;
+  border: 2px solid var(--blue);
+  border-radius: 999px;
+  background: var(--blue);
+  color: #ffffff;
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.chat-choice-button--secondary {
+  background: #ffffff;
+  color: var(--blue-strong);
+  border-color: #8ccdf0;
+}
+
 .chat-input-area {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
