@@ -452,12 +452,13 @@ h1:not(.home-title) {
   gap: 10px;
   min-height: 260px;
   padding: 16px;
-  border: 1px solid #f4d9d4;
+  border: 1px solid #b9ddef;
   border-radius: 22px;
-  background: linear-gradient(180deg, #fff9f4 0%, #fff1ec 100%);
+  background: linear-gradient(180deg, #f8fdff 0%, #eef9ff 100%);
 }
 
 .chat-bubble {
+  position: relative;
   width: fit-content;
   max-width: min(84%, 420px);
   padding: 12px 14px;
@@ -465,7 +466,7 @@ h1:not(.home-title) {
   font-weight: 800;
   line-height: 1.65;
   white-space: pre-line;
-  box-shadow: 0 10px 24px rgba(233, 90, 120, 0.08);
+  box-shadow: 0 10px 24px rgba(31, 127, 209, 0.1);
 }
 
 .chat-bubble--slime {
@@ -473,7 +474,20 @@ h1:not(.home-title) {
   border-bottom-left-radius: 8px;
   background: #ffffff;
   color: var(--text);
-  border: 1px solid #ffd8d0;
+  border: 1px solid #b9ddef;
+}
+
+.chat-bubble--slime::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  bottom: 12px;
+  width: 14px;
+  height: 14px;
+  border-left: 1px solid #b9ddef;
+  border-bottom: 1px solid #b9ddef;
+  background: #ffffff;
+  transform: rotate(45deg);
 }
 
 .chat-bubble--user {
@@ -481,6 +495,17 @@ h1:not(.home-title) {
   border-bottom-right-radius: 8px;
   background: var(--blue);
   color: #ffffff;
+}
+
+.chat-bubble--user::after {
+  content: "";
+  position: absolute;
+  right: -7px;
+  bottom: 12px;
+  width: 14px;
+  height: 14px;
+  background: var(--blue);
+  transform: rotate(45deg);
 }
 
 .chat-input-area {
@@ -492,12 +517,12 @@ h1:not(.home-title) {
 
 .chat-input-area input {
   width: 100%;
-  min-height: 56px;
-  border: 2px solid #f4c5bd;
-  border-radius: 18px;
+  min-height: 52px;
+  border: 2px solid #b9ddef;
+  border-radius: 22px;
   background: #ffffff;
   color: var(--text);
-  padding: 0 14px;
+  padding: 12px 16px;
   font-weight: 800;
   outline: none;
 }
@@ -508,14 +533,14 @@ h1:not(.home-title) {
 }
 
 .chat-send-button {
-  min-height: 56px;
+  min-height: 52px;
   border: 0;
-  border-radius: 18px;
-  background: var(--warm-strong);
+  border-radius: 22px;
+  background: var(--blue);
   color: #ffffff;
   padding: 0 18px;
   font-weight: 900;
-  box-shadow: 0 12px 28px rgba(233, 90, 120, 0.2);
+  box-shadow: 0 12px 28px rgba(31, 127, 209, 0.22);
 }
 
 .chat-confirm-actions {
