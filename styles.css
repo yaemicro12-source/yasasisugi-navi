@@ -450,7 +450,8 @@ h1:not(.home-title) {
 .chat-log {
   display: grid;
   gap: 10px;
-  min-height: 260px;
+  align-content: start;
+  min-height: auto;
   padding: 16px;
   border: 1px solid #b9ddef;
   border-radius: 22px;
