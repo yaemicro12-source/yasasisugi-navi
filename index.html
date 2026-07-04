@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Yasasisugi Navi</title>
-  <link rel="stylesheet" href="styles.css?v=20260704-slime-drag">
+  <link rel="stylesheet" href="styles.css?v=20260704-main-chat">
 </head>
 <body>
   <main>
@@ -32,7 +32,7 @@
         </div>
 
         <div class="main-actions" aria-label="メインメニュー">
-          <a class="action-button" href="goal.html">
+          <a class="action-button" href="#goal-section">
             もくてきち
           </a>
           <a class="action-button" href="schedule.html">
@@ -47,10 +47,36 @@
           <h2>迷ったときのサポート</h2>
           <p>見えるものや写真から現在地を確認する機能は今後追加予定です。今は、近くの目印や駅名をゆっくり確認してみましょう。</p>
         </div>
+
+        <section id="goal-section" class="chat-goal home-chat" aria-labelledby="goal-title">
+          <div class="chat-hero">
+            <p class="eyebrow">もくてきち</p>
+            <h2 id="goal-title">ねこスライムに教えてね</h2>
+          </div>
+
+          <div id="goal-chat-log" class="chat-log" aria-live="polite"></div>
+
+          <form id="goal-chat-form" class="chat-input-area">
+            <label class="sr-only" for="goal-chat-input">こたえを入力</label>
+            <input id="goal-chat-input" type="text" autocomplete="off" placeholder="ここに入力してね">
+            <button class="chat-send-button" type="submit">送信</button>
+          </form>
+
+          <div id="goal-chat-actions" class="chat-confirm-actions" hidden></div>
+
+          <div class="goal-hidden-fields" aria-hidden="true">
+            <input id="goal-place" name="goalPlace" type="hidden">
+            <input id="arrival-hour" name="arrivalHour" type="hidden" value="10">
+            <input id="arrival-minute" name="arrivalMinute" type="hidden" value="00">
+            <input id="arrival-buffer" name="arrivalBuffer" type="hidden" value="10">
+            <input id="train-time" name="trainTime" type="hidden">
+            <input id="train-duration" name="trainDuration" type="hidden">
+          </div>
+        </section>
       </div>
     </section>
   </main>
 
-  <script src="app.js?v=20260704-slime-drag"></script>
+  <script src="app.js?v=20260704-main-chat"></script>
 </body>
 </html>

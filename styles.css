@@ -600,6 +600,15 @@ h1:not(.home-title) {
   gap: 18px;
 }
 
+.home-chat {
+  margin-top: 28px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: var(--shadow);
+}
+
 .chat-hero {
   display: grid;
   justify-items: center;

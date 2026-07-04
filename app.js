@@ -854,7 +854,7 @@ function hasGoalPlace() {
 
 function redirectScheduleWithoutGoal() {
   if ((timeline || moodSlider || moodOptions.length || settingDecisionButton) && !hasGoalPlace()) {
-    window.location.replace("goal.html");
+    window.location.replace("index.html#goal-section");
   }
 }
 
@@ -1060,7 +1060,7 @@ function renderRouteResult() {
 
 function moveToSchedulePage() {
   savePlan();
-  window.location.href = "schedule-setting.html";
+  window.location.href = "schedule.html";
 }
 
 function setRecommendedBuffer(nextMinutes, options = {}) {
@@ -1155,7 +1155,7 @@ function renderFinalSchedule() {
 function clearPlanAndStartNew() {
   localStorage.removeItem(storageKey);
   savedValues = {};
-  window.location.href = "goal.html";
+  window.location.href = "index.html#goal-section";
 }
 
 function getRouteScheduleSteps() {
