@@ -304,6 +304,10 @@ const goalChatSteps = [
   }
 ];
 
+const arrivalBufferChoices = [5, 10, 15, 20, 30];
+const moodBufferChoices = [30, 25, 20, 15, 5];
+const customBufferChoices = [0, 5, 10, 15, 20, 25, 30];
+
 function appendChatBubble(text, type = "slime") {
   if (!goalChatLog) {
     return;
@@ -372,11 +376,35 @@ function appendGoalChatButtonBubble(buttons) {
   goalChatLog.append(bubble);
 }
 
+function appendGoalChatMoodBubble() {
+  if (!goalChatLog) {
+    return;
+  }
+
+  const bubble = document.createElement("div");
+  const buttonGroup = document.createElement("div");
+
+  bubble.className = "chat-bubble chat-bubble--slime chat-action-bubble";
+  buttonGroup.className = "chat-mood-options";
+
+  moodBufferChoices.forEach((minutes) => {
+    const button = document.createElement("button");
+    button.className = "chat-mood-option";
+    button.type = "button";
+    button.setAttribute("aria-label", `予備時間${minutes}分`);
+    button.addEventListener("click", () => selectGoalChatBuffer(minutes));
+    buttonGroup.append(button);
+  });
+
+  bubble.append(buttonGroup);
+  goalChatLog.append(bubble);
+}
+
 function askCurrentGoalQuestion() {
   const step = goalChatSteps[currentGoalChatStep];
 
   if (!step) {
-    showGoalChatConfirmation();
+    showGoalChatArrivalBufferQuestion();
     return;
   }
 
@@ -391,6 +419,85 @@ function askCurrentGoalQuestion() {
     goalChatInput.placeholder = step.placeholder;
     goalChatInput.focus();
   }
+}
+
+function showGoalChatArrivalBufferQuestion() {
+  removeGoalChatActionBubbles();
+  appendChatBubble("何分前につきたい？", "slime");
+  appendGoalChatButtonBubble(
+    arrivalBufferChoices.map((minutes) => ({
+      label: `${minutes}分前`,
+      onClick: () => {
+        removeGoalChatActionBubbles();
+        goalChatAnswers.arrivalBuffer = minutes;
+        appendChatBubble(`${minutes}分前`, "user");
+        showGoalChatMoodQuestion();
+      }
+    }))
+  );
+
+  if (goalChatForm) {
+    goalChatForm.hidden = true;
+  }
+}
+
+function showGoalChatMoodQuestion() {
+  appendChatBubble("今日の気分", "slime");
+  appendGoalChatMoodBubble();
+}
+
+function selectGoalChatBuffer(minutes) {
+  removeGoalChatActionBubbles();
+  goalChatAnswers.recommendedBufferMinutes = minutes;
+  recommendedBufferMinutes = minutes;
+  appendChatBubble(`予備時間：${minutes}分`, "user");
+  showGoalChatBufferConfirmation();
+}
+
+function showGoalChatBufferConfirmation() {
+  const minutes = goalChatAnswers.recommendedBufferMinutes ?? recommendedBufferMinutes;
+
+  appendChatBubble(`予備時間：${minutes}分の余裕をもってスケジュールをたてていいかな？`, "slime");
+  appendGoalChatButtonBubble([
+    {
+      label: "予定をたてる",
+      onClick: createGoalChatSchedule
+    },
+    {
+      label: "変更",
+      variant: "secondary",
+      onClick: showGoalChatChangeChoices
+    }
+  ]);
+}
+
+function showGoalChatChangeChoices() {
+  removeGoalChatActionBubbles();
+  appendChatBubble("どこを変更する？", "slime");
+  appendGoalChatButtonBubble([
+    { label: "もくてきち", onClick: () => editGoalChatAnswer("destination") },
+    { label: "到着じかん", onClick: () => editGoalChatAnswer("arrivalTime") },
+    { label: "電車にのる時間", onClick: () => editGoalChatAnswer("trainTime") },
+    { label: "電車での移動時間", onClick: () => editGoalChatAnswer("trainDuration") },
+    { label: "予備時間", onClick: showGoalChatBufferChoices }
+  ]);
+}
+
+function showGoalChatBufferChoices() {
+  removeGoalChatActionBubbles();
+  appendChatBubble("予備時間を選んでね", "slime");
+  appendGoalChatButtonBubble(
+    customBufferChoices.map((minutes) => ({
+      label: `${minutes}分`,
+      onClick: () => selectGoalChatBuffer(minutes)
+    }))
+  );
+}
+
+function createGoalChatSchedule() {
+  applyGoalChatAnswersToFields();
+  savePlan();
+  window.location.href = "schedule.html";
 }
 
 function applyGoalChatAnswersToFields() {
@@ -415,46 +522,12 @@ function applyGoalChatAnswersToFields() {
   if (fields.trainDuration) {
     fields.trainDuration.value = String(goalChatAnswers.trainDuration);
   }
-}
 
-function showGoalChatConfirmation() {
-  removeGoalChatActionBubbles();
-  appendChatBubble("ありがとう！この内容で予定を作るね", "slime");
-  appendChatBubble(
-    `行き先：${goalChatAnswers.destination}\n到着したい時刻：${goalChatAnswers.arrivalTime}\n電車に乗る時刻：${goalChatAnswers.trainTime}\n電車での移動時間：${goalChatAnswers.trainDuration}分`,
-    "slime"
-  );
-
-  if (goalChatForm) {
-    goalChatForm.hidden = true;
+  if (fields.arrivalBuffer) {
+    fields.arrivalBuffer.value = String(goalChatAnswers.arrivalBuffer || 10);
   }
 
-  appendGoalChatButtonBubble([
-    {
-      label: "予定を作る",
-      onClick: () => {
-        applyGoalChatAnswersToFields();
-        savePlan();
-        window.location.href = "schedule-setting.html";
-      }
-    },
-    {
-      label: "なおす",
-      variant: "secondary",
-      onClick: showGoalChatFixChoices
-    }
-  ]);
-}
-
-function showGoalChatFixChoices() {
-  removeGoalChatActionBubbles();
-  appendChatBubble("どこを直す？", "slime");
-  appendGoalChatButtonBubble([
-    { label: "もくてきち", onClick: () => editGoalChatAnswer("destination") },
-    { label: "到着じかん", onClick: () => editGoalChatAnswer("arrivalTime") },
-    { label: "電車にのる時間", onClick: () => editGoalChatAnswer("trainTime") },
-    { label: "電車での移動時間", onClick: () => editGoalChatAnswer("trainDuration") }
-  ]);
+  recommendedBufferMinutes = Number(goalChatAnswers.recommendedBufferMinutes ?? recommendedBufferMinutes);
 }
 
 function editGoalChatAnswer(key) {
@@ -483,6 +556,8 @@ function resetGoalChat() {
   if (goalChatLog) {
     goalChatLog.replaceChildren();
   }
+
+  recommendedBufferMinutes = 25;
 
   if (goalChatActions) {
     goalChatActions.hidden = true;
@@ -525,7 +600,7 @@ function initializeGoalChat() {
 
     if (goalChatEditKey) {
       goalChatEditKey = "";
-      showGoalChatConfirmation();
+      showGoalChatArrivalBufferQuestion();
       return;
     }
 
@@ -629,9 +704,7 @@ function savePlan() {
     nextPlan.startType = startType;
   }
 
-  if (bufferMinutesOutput) {
-    nextPlan.recommendedBufferMinutes = recommendedBufferMinutes;
-  }
+  nextPlan.recommendedBufferMinutes = recommendedBufferMinutes;
 
   nextPlan.stepState = serializeStepState();
 
