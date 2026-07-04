@@ -4,6 +4,7 @@ const currentTimeOutput = document.querySelector("#current-time");
 const nextReminderOutput = document.querySelector("#next-reminder");
 const navigatorMessage = document.querySelector("#navigator-message");
 const catSlime = document.querySelector(".cat-slime");
+const catSlimeImage = catSlime?.matches("img") ? catSlime : catSlime?.querySelector(".slime-body");
 const timeline = document.querySelector("#timeline");
 const achievementPercent = document.querySelector("#achievement-percent");
 const achievementBlocks = document.querySelector("#achievement-blocks");
@@ -106,6 +107,7 @@ let catSlimeHappyTimerId;
 let catSlimeSleepClockId;
 let catSlimeIsHappy = false;
 let catSlimeLastInteractionAt = Date.now();
+let catSlimeDragState;
 
 function isCatSlimeSleepTime() {
   const hour = new Date().getHours();
@@ -113,11 +115,11 @@ function isCatSlimeSleepTime() {
 }
 
 function setCatSlimeImage(src) {
-  if (!catSlime || catSlime.getAttribute("src") === src) {
+  if (!catSlimeImage || catSlimeImage.getAttribute("src") === src) {
     return;
   }
 
-  catSlime.setAttribute("src", src);
+  catSlimeImage.setAttribute("src", src);
 }
 
 function setCatSlimeRestingImage() {
@@ -146,6 +148,10 @@ function resetCatSlimeState() {
     return;
   }
 
+  if (catSlimeDragState?.isDragging) {
+    return;
+  }
+
   catSlimeLastInteractionAt = Date.now();
   window.clearTimeout(catSlimeHappyTimerId);
   catSlimeIsHappy = false;
@@ -155,6 +161,10 @@ function resetCatSlimeState() {
 
 function showCatSlimeHappy() {
   if (!catSlime) {
+    return;
+  }
+
+  if (catSlimeDragState?.isDragging) {
     return;
   }
 
@@ -197,6 +207,141 @@ function initializeCatSlimeIdleState() {
   window.addEventListener("pointerdown", showCatSlimeHappy, { passive: true });
   resetCatSlimeState();
   watchCatSlimeSleepTime();
+  initializeCatSlimeDrag();
+}
+
+function clampNumber(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function getDragPoint(event) {
+  const touch = event.touches?.[0] || event.changedTouches?.[0];
+  return {
+    x: touch ? touch.clientX : event.clientX,
+    y: touch ? touch.clientY : event.clientY
+  };
+}
+
+function applyCatSlimeDragTransform() {
+  if (!catSlimeDragState?.isDragging) {
+    return;
+  }
+
+  const { dx, dy } = catSlimeDragState;
+  const limitedX = clampNumber(dx, -42, 42);
+  const limitedY = clampNumber(dy, -42, 42);
+  const scaleX = 1 + clampNumber(Math.abs(dx) / 120, 0, 0.35);
+  const scaleY = 1 + clampNumber(Math.abs(dy) / 120, 0, 0.35);
+  const rotate = clampNumber(dx / 34, -4, 4);
+  const lagX = clampNumber(catSlimeDragState.earX + ((-limitedX * 0.14) - catSlimeDragState.earX) * 0.22, -6, 6);
+  const lagY = clampNumber(catSlimeDragState.earY + ((-limitedY * 0.14) - catSlimeDragState.earY) * 0.22, -6, 6);
+
+  catSlimeDragState.earX = lagX;
+  catSlimeDragState.earY = lagY;
+
+  catSlime.style.setProperty("--slime-x", `${limitedX}px`);
+  catSlime.style.setProperty("--slime-y", `${limitedY}px`);
+  catSlime.style.setProperty("--slime-scale-x", scaleX.toFixed(3));
+  catSlime.style.setProperty("--slime-scale-y", scaleY.toFixed(3));
+  catSlime.style.setProperty("--slime-rotate", `${rotate.toFixed(2)}deg`);
+  catSlime.style.setProperty("--slime-ear-x", `${lagX.toFixed(2)}px`);
+  catSlime.style.setProperty("--slime-ear-y", `${lagY.toFixed(2)}px`);
+  catSlime.style.setProperty("--slime-ear-rotate-left", `${(-7 + lagX * -0.8).toFixed(2)}deg`);
+  catSlime.style.setProperty("--slime-ear-rotate-right", `${(7 + lagX * -0.8).toFixed(2)}deg`);
+
+  catSlimeDragState.frameId = window.requestAnimationFrame(applyCatSlimeDragTransform);
+}
+
+function startCatSlimeDrag(event) {
+  if (!catSlime || event.target.closest?.("input, textarea, select, button, a")) {
+    return;
+  }
+
+  const point = getDragPoint(event);
+  catSlimeLastInteractionAt = Date.now();
+  window.clearTimeout(catSlimeHappyTimerId);
+  window.clearTimeout(catSlimeIdleTimerId);
+  window.clearTimeout(catSlimeSleepTimerId);
+  catSlime.classList.remove("is-releasing");
+  catSlime.classList.add("is-pressing");
+
+  catSlimeDragState = {
+    isDragging: false,
+    startX: point.x,
+    startY: point.y,
+    dx: 0,
+    dy: 0,
+    earX: 0,
+    earY: 0,
+    frameId: 0
+  };
+
+  window.setTimeout(() => {
+    catSlime?.classList.remove("is-pressing");
+  }, 110);
+}
+
+function moveCatSlimeDrag(event) {
+  if (!catSlimeDragState) {
+    return;
+  }
+
+  const point = getDragPoint(event);
+  catSlimeDragState.dx = point.x - catSlimeDragState.startX;
+  catSlimeDragState.dy = point.y - catSlimeDragState.startY;
+
+  if (Math.abs(catSlimeDragState.dx) > 3 || Math.abs(catSlimeDragState.dy) > 3) {
+    event.preventDefault();
+    catSlime.classList.remove("is-pressing");
+    catSlime.classList.add("is-dragging");
+
+    if (!catSlimeDragState.isDragging) {
+      catSlimeDragState.isDragging = true;
+      catSlimeDragState.frameId = window.requestAnimationFrame(applyCatSlimeDragTransform);
+    }
+  }
+}
+
+function endCatSlimeDrag() {
+  if (!catSlimeDragState) {
+    return;
+  }
+
+  window.cancelAnimationFrame(catSlimeDragState.frameId);
+  catSlime.classList.remove("is-pressing", "is-dragging");
+  catSlime.classList.add("is-releasing");
+  catSlimeDragState = null;
+
+  window.setTimeout(() => {
+    if (!catSlime) {
+      return;
+    }
+
+    catSlime.classList.remove("is-releasing");
+    catSlime.style.removeProperty("--slime-x");
+    catSlime.style.removeProperty("--slime-y");
+    catSlime.style.removeProperty("--slime-scale-x");
+    catSlime.style.removeProperty("--slime-scale-y");
+    catSlime.style.removeProperty("--slime-rotate");
+    catSlime.style.removeProperty("--slime-ear-x");
+    catSlime.style.removeProperty("--slime-ear-y");
+    catSlime.style.removeProperty("--slime-ear-rotate-left");
+    catSlime.style.removeProperty("--slime-ear-rotate-right");
+    scheduleCatSlimeIdleImages();
+  }, 580);
+}
+
+function initializeCatSlimeDrag() {
+  if (!catSlime) {
+    return;
+  }
+
+  catSlime.addEventListener("touchstart", startCatSlimeDrag, { passive: true });
+  catSlime.addEventListener("touchmove", moveCatSlimeDrag, { passive: false });
+  window.addEventListener("touchend", endCatSlimeDrag, { passive: true });
+  catSlime.addEventListener("mousedown", startCatSlimeDrag);
+  window.addEventListener("mousemove", moveCatSlimeDrag);
+  window.addEventListener("mouseup", endCatSlimeDrag);
 }
 
 function normalizeInputText(value) {

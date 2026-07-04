@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>もくてきち - Yasasisugi Navi</title>
-  <link rel="stylesheet" href="styles.css?v=20260704-chat-tuning">
+  <link rel="stylesheet" href="styles.css?v=20260704-slime-drag">
 </head>
 <body>
   <main class="subpage">
@@ -17,7 +17,11 @@
       <div class="chat-hero">
         <p class="eyebrow">もくてきち</p>
         <h1 id="goal-title">ねこスライムに教えてね</h1>
-        <img class="chat-slime cat-slime" src="nomal.png" alt="猫スライム">
+        <div class="slime-wrap chat-slime cat-slime">
+          <img class="slime-body" src="nomal.png" alt="猫スライム">
+          <span class="slime-ear-left" aria-hidden="true"></span>
+          <span class="slime-ear-right" aria-hidden="true"></span>
+        </div>
       </div>
 
       <div id="goal-chat-log" class="chat-log" aria-live="polite"></div>
@@ -41,6 +45,6 @@
     </section>
   </main>
 
-  <script src="app.js?v=20260704-chat-tuning"></script>
+  <script src="app.js?v=20260704-slime-drag"></script>
 </body>
 </html>
