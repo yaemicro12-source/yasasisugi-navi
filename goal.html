@@ -13,121 +13,29 @@
       <a href="schedule.html">スケジュール</a>
     </nav>
 
-    <section id="goal-section" class="section-panel" aria-labelledby="goal-title">
-      <div class="section-heading">
+    <section id="goal-section" class="section-panel chat-goal" aria-labelledby="goal-title">
+      <div class="chat-hero">
         <p class="eyebrow">もくてきち</p>
-        <h1 id="goal-title">どこへ行く？</h1>
-        <p>出発場所と目的地、つきたい時間を決めます。</p>
+        <h1 id="goal-title">ねこスライムに教えてね</h1>
+        <img class="chat-slime cat-slime" src="nomal.png" alt="猫スライム">
       </div>
 
-      <div class="route-form">
-        <section class="compact-choice" aria-labelledby="start-choice-title">
-          <h2 id="start-choice-title">出発地</h2>
-          <div class="segmented-choice" role="radiogroup" aria-label="出発場所">
-            <label>
-              <input id="start-home" type="radio" name="start-type" value="home" checked>
-              <span>家</span>
-            </label>
-            <label>
-              <input id="start-work" type="radio" name="start-type" value="work">
-              <span>職場</span>
-            </label>
-            <label>
-              <input id="start-current" type="radio" name="start-type" value="current">
-              <span>現在地</span>
-            </label>
-          </div>
-          <p id="current-location-note" class="current-location-note" hidden>
-            現在地機能は今後追加予定です。現在は仮の最寄り駅で計算しています。
-          </p>
-        </section>
+      <div id="goal-chat-log" class="chat-log" aria-live="polite"></div>
 
-        <label class="route-field route-field--goal">
-          <span class="route-field-title">もくてきち</span>
-          <input id="goal-place" type="text" placeholder="例：渋谷">
-        </label>
+      <form id="goal-chat-form" class="chat-input-area">
+        <label class="sr-only" for="goal-chat-input">こたえを入力</label>
+        <input id="goal-chat-input" type="text" autocomplete="off" placeholder="ここに入力してね">
+        <button class="chat-send-button" type="submit">送信</button>
+      </form>
 
-        <section class="arrival-card" aria-labelledby="arrival-title">
-          <h2 id="arrival-title">到着希望日時</h2>
-          <div class="date-buttons" aria-label="到着日">
-            <button id="today-button" class="date-button is-selected" type="button">今日</button>
-            <button id="tomorrow-button" class="date-button" type="button">明日</button>
-          </div>
+      <div id="goal-chat-actions" class="chat-confirm-actions" hidden></div>
 
-          <div class="arrival-time">
-            <label class="field">
-              <span>時</span>
-              <select id="arrival-hour" aria-label="到着希望時刻の時">
-                <option value="00">00</option>
-                <option value="01">01</option>
-                <option value="02">02</option>
-                <option value="03">03</option>
-                <option value="04">04</option>
-                <option value="05">05</option>
-                <option value="06">06</option>
-                <option value="07">07</option>
-                <option value="08">08</option>
-                <option value="09">09</option>
-                <option value="10" selected>10</option>
-                <option value="11">11</option>
-                <option value="12">12</option>
-                <option value="13">13</option>
-                <option value="14">14</option>
-                <option value="15">15</option>
-                <option value="16">16</option>
-                <option value="17">17</option>
-                <option value="18">18</option>
-                <option value="19">19</option>
-                <option value="20">20</option>
-                <option value="21">21</option>
-                <option value="22">22</option>
-                <option value="23">23</option>
-              </select>
-            </label>
-
-            <label class="field">
-              <span>分</span>
-              <select id="arrival-minute" aria-label="到着希望時刻の分">
-                <option value="00" selected>00</option>
-                <option value="05">05</option>
-                <option value="10">10</option>
-                <option value="15">15</option>
-                <option value="20">20</option>
-                <option value="25">25</option>
-                <option value="30">30</option>
-                <option value="35">35</option>
-                <option value="40">40</option>
-                <option value="45">45</option>
-                <option value="50">50</option>
-                <option value="55">55</option>
-              </select>
-            </label>
-          </div>
-        </section>
-
-        <section class="arrival-card" aria-labelledby="train-title">
-          <h2 id="train-title">電車の時間</h2>
-          <label class="field">
-            <span>電車に乗る時間</span>
-            <input id="train-time" type="time">
-          </label>
-          <label class="field">
-            <span>電車に乗っている時間</span>
-            <div class="number-with-unit">
-              <input id="train-duration" type="number" min="1" placeholder="例：32">
-              <span>分</span>
-            </div>
-          </label>
-        </section>
-      </div>
-
-      <div class="page-actions page-actions--split">
-        <button id="route-search-button" class="secondary-action" type="button">
-          乗換案内で調べる
-        </button>
-        <button id="calculate-button" class="action-button" type="button">
-          予定をたてる
-        </button>
+      <div class="goal-hidden-fields" aria-hidden="true">
+        <input id="goal-place" name="goalPlace" type="hidden">
+        <input id="arrival-hour" name="arrivalHour" type="hidden" value="10">
+        <input id="arrival-minute" name="arrivalMinute" type="hidden" value="00">
+        <input id="train-time" name="trainTime" type="hidden">
+        <input id="train-duration" name="trainDuration" type="hidden">
       </div>
     </section>
   </main>

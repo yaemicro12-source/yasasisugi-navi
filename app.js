@@ -25,6 +25,10 @@ const arrivalComplete = document.querySelector("#arrival-complete");
 const moodSlider = document.querySelector("#mood-slider");
 const moodOptions = document.querySelectorAll(".mood-option");
 const settingDecisionButton = document.querySelector("#setting-decision-button");
+const goalChatLog = document.querySelector("#goal-chat-log");
+const goalChatForm = document.querySelector("#goal-chat-form");
+const goalChatInput = document.querySelector("#goal-chat-input");
+const goalChatActions = document.querySelector("#goal-chat-actions");
 
 const fields = {
   goalPlace: document.querySelector("#goal-place"),
@@ -93,6 +97,8 @@ const stepState = {
 };
 
 let currentPlan = [];
+let currentGoalChatStep = 0;
+let goalChatAnswers = {};
 let catSlimeIdleTimerId;
 let catSlimeSleepTimerId;
 let catSlimeHappyTimerId;
@@ -190,6 +196,246 @@ function initializeCatSlimeIdleState() {
   window.addEventListener("pointerdown", showCatSlimeHappy, { passive: true });
   resetCatSlimeState();
   watchCatSlimeSleepTime();
+}
+
+function normalizeInputText(value) {
+  return value
+    .trim()
+    .replace(/[０-９]/g, (char) => String.fromCharCode(char.charCodeAt(0) - 0xfee0))
+    .replace(/：/g, ":")
+    .replace(/\s+/g, "");
+}
+
+function normalizeTimeInput(value) {
+  const text = normalizeInputText(value);
+  const meridiem = text.includes("午後") ? "pm" : text.includes("午前") ? "am" : "";
+  const timeText = text.replace(/午前|午後/g, "");
+  let hours;
+  let minutes = 0;
+
+  const colonMatch = timeText.match(/^(\d{1,2}):(\d{1,2})$/);
+  const japaneseMatch = timeText.match(/^(\d{1,2})時(?:(\d{1,2})分?)?$/);
+
+  if (colonMatch) {
+    hours = Number(colonMatch[1]);
+    minutes = Number(colonMatch[2]);
+  } else if (japaneseMatch) {
+    hours = Number(japaneseMatch[1]);
+    minutes = japaneseMatch[2] === undefined ? 0 : Number(japaneseMatch[2]);
+  } else {
+    return null;
+  }
+
+  if (meridiem === "pm" && hours < 12) {
+    hours += 12;
+  }
+
+  if (meridiem === "am" && hours === 12) {
+    hours = 0;
+  }
+
+  if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+    return null;
+  }
+
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
+
+function normalizeDurationInput(value) {
+  const text = normalizeInputText(value);
+  const hourMinuteMatch = text.match(/^(?:(\d+)時間)?(?:(\d+)分?)?$/);
+
+  if (!hourMinuteMatch || (!hourMinuteMatch[1] && !hourMinuteMatch[2])) {
+    return null;
+  }
+
+  const hours = Number(hourMinuteMatch[1] || 0);
+  const minutes = Number(hourMinuteMatch[2] || 0);
+  const totalMinutes = hours * 60 + minutes;
+
+  return totalMinutes > 0 ? totalMinutes : null;
+}
+
+function validateDestination(value) {
+  const destination = value.trim();
+  return destination ? { value: destination } : { error: "行き先を教えてね" };
+}
+
+function validateArrivalTime(value) {
+  const time = normalizeTimeInput(value);
+  return time ? { value: time } : { error: "『10:00』や『10時30分』みたいに教えてね" };
+}
+
+function validateTrainTime(value) {
+  const time = normalizeTimeInput(value);
+  return time ? { value: time } : { error: "『9:20』みたいに教えてね" };
+}
+
+function validateTrainDuration(value) {
+  const minutes = normalizeDurationInput(value);
+  return minutes ? { value: minutes } : { error: "『20分』みたいに教えてね" };
+}
+
+const goalChatSteps = [
+  {
+    key: "destination",
+    question: "今日はどこへ行く？",
+    placeholder: "例：新宿",
+    validate: validateDestination
+  },
+  {
+    key: "arrivalTime",
+    question: "何時までに着きたい？",
+    placeholder: "例：10:00",
+    validate: validateArrivalTime
+  },
+  {
+    key: "trainTime",
+    question: "何時の電車に乗る？",
+    placeholder: "例：9:20",
+    validate: validateTrainTime
+  },
+  {
+    key: "trainDuration",
+    question: "電車には何分くらい乗る？",
+    placeholder: "例：20分",
+    validate: validateTrainDuration
+  }
+];
+
+function appendChatBubble(text, type = "slime") {
+  if (!goalChatLog) {
+    return;
+  }
+
+  const bubble = document.createElement("div");
+  bubble.className = `chat-bubble chat-bubble--${type}`;
+  bubble.textContent = text;
+  goalChatLog.append(bubble);
+}
+
+function askCurrentGoalQuestion() {
+  const step = goalChatSteps[currentGoalChatStep];
+
+  if (!step) {
+    showGoalChatConfirmation();
+    return;
+  }
+
+  appendChatBubble(step.question, "slime");
+
+  if (goalChatInput) {
+    goalChatInput.value = "";
+    goalChatInput.placeholder = step.placeholder;
+    goalChatInput.focus();
+  }
+}
+
+function applyGoalChatAnswersToFields() {
+  const [arrivalHour, arrivalMinute] = goalChatAnswers.arrivalTime.split(":");
+
+  if (fields.goalPlace) {
+    fields.goalPlace.value = goalChatAnswers.destination;
+  }
+
+  if (fields.arrivalHour) {
+    fields.arrivalHour.value = arrivalHour;
+  }
+
+  if (fields.arrivalMinute) {
+    fields.arrivalMinute.value = arrivalMinute;
+  }
+
+  if (fields.trainTime) {
+    fields.trainTime.value = goalChatAnswers.trainTime;
+  }
+
+  if (fields.trainDuration) {
+    fields.trainDuration.value = String(goalChatAnswers.trainDuration);
+  }
+}
+
+function showGoalChatConfirmation() {
+  appendChatBubble("ありがとう！この内容で予定を作るね", "slime");
+  appendChatBubble(
+    `行き先：${goalChatAnswers.destination}\n到着したい時刻：${goalChatAnswers.arrivalTime}\n電車に乗る時刻：${goalChatAnswers.trainTime}\n電車での移動時間：${goalChatAnswers.trainDuration}分`,
+    "slime"
+  );
+
+  if (goalChatForm) {
+    goalChatForm.hidden = true;
+  }
+
+  if (!goalChatActions) {
+    return;
+  }
+
+  goalChatActions.hidden = false;
+  goalChatActions.replaceChildren();
+
+  const createButton = document.createElement("button");
+  createButton.className = "action-button";
+  createButton.type = "button";
+  createButton.textContent = "予定を作る";
+  createButton.addEventListener("click", () => {
+    applyGoalChatAnswersToFields();
+    savePlan();
+    window.location.href = "schedule-setting.html";
+  });
+
+  const restartButton = document.createElement("button");
+  restartButton.className = "secondary-action";
+  restartButton.type = "button";
+  restartButton.textContent = "なおす";
+  restartButton.addEventListener("click", resetGoalChat);
+
+  goalChatActions.append(createButton, restartButton);
+}
+
+function resetGoalChat() {
+  currentGoalChatStep = 0;
+  goalChatAnswers = {};
+
+  if (goalChatLog) {
+    goalChatLog.replaceChildren();
+  }
+
+  if (goalChatActions) {
+    goalChatActions.hidden = true;
+    goalChatActions.replaceChildren();
+  }
+
+  if (goalChatForm) {
+    goalChatForm.hidden = false;
+  }
+
+  askCurrentGoalQuestion();
+}
+
+function initializeGoalChat() {
+  if (!goalChatForm || !goalChatInput || !goalChatLog) {
+    return;
+  }
+
+  goalChatForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const step = goalChatSteps[currentGoalChatStep];
+    const inputValue = goalChatInput.value;
+    const result = step.validate(inputValue);
+
+    if (result.error) {
+      appendChatBubble(result.error, "slime");
+      return;
+    }
+
+    appendChatBubble(inputValue.trim(), "user");
+    goalChatAnswers[step.key] = result.value;
+    currentGoalChatStep += 1;
+    askCurrentGoalQuestion();
+  });
+
+  resetGoalChat();
 }
 
 function serializeStepState() {
@@ -874,6 +1120,7 @@ if (arrivalComplete) {
 loadSavedPlan();
 redirectScheduleWithoutGoal();
 initializeCatSlimeIdleState();
+initializeGoalChat();
 
 getAvailableFields().forEach((field) => {
   field.addEventListener("input", calculatePlan);
