@@ -5,7 +5,7 @@ const nextReminderOutput = document.querySelector("#next-reminder");
 const navigatorMessage = document.querySelector("#navigator-message");
 const catSlime = document.querySelector(".cat-slime");
 const catSlimeImage = catSlime?.matches("img") ? catSlime : catSlime?.querySelector(".slime-body");
-const catSlimeAssetVersion = "20260708";
+const catSlimeAssetVersion = "20260708b";
 
 function catSlimeAsset(src) {
   return `${src}?v=${catSlimeAssetVersion}`;

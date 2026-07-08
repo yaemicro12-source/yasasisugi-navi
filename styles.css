@@ -109,8 +109,8 @@ p {
 .navigator {
   display: grid;
   justify-items: center;
-  gap: 8px;
-  margin: 0 auto 8px;
+  gap: 4px;
+  margin: -6px auto 0;
 }
 
 .speech {
@@ -145,10 +145,10 @@ p {
 .character-slot {
   display: grid;
   place-items: center;
-  width: min(88vw, 520px);
+  width: min(90vw, 560px);
   min-width: 260px;
   aspect-ratio: 1;
-  margin-top: -28px;
+  margin-top: -64px;
 }
 
 .slime-wrap {
@@ -166,7 +166,7 @@ p {
   place-items: center;
   width: 100%;
   max-width: 100%;
-  max-height: min(48vh, 520px);
+  max-height: min(44vh, 460px);
   transform-origin: 50% 82%;
   transform: translate3d(var(--slime-x), var(--slime-y), 0) rotate(var(--slime-rotate)) scale(var(--slime-scale-x), var(--slime-scale-y));
   animation: slime-idle 3.4s ease-in-out infinite;
@@ -405,7 +405,7 @@ h1:not(.home-title) {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(6px, 2.4vw, 12px);
-  margin-top: -4px;
+  margin-top: -24px;
 }
 
 .action-button {
