@@ -109,8 +109,8 @@ p {
 .navigator {
   display: grid;
   justify-items: center;
-  gap: 14px;
-  margin: 4px auto 18px;
+  gap: 8px;
+  margin: 0 auto 8px;
 }
 
 .speech {
@@ -148,6 +148,7 @@ p {
   width: min(88vw, 520px);
   min-width: 260px;
   aspect-ratio: 1;
+  margin-top: -28px;
 }
 
 .slime-wrap {
@@ -404,7 +405,7 @@ h1:not(.home-title) {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(6px, 2.4vw, 12px);
-  margin-top: 10px;
+  margin-top: -4px;
 }
 
 .action-button {
