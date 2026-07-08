@@ -5,6 +5,11 @@ const nextReminderOutput = document.querySelector("#next-reminder");
 const navigatorMessage = document.querySelector("#navigator-message");
 const catSlime = document.querySelector(".cat-slime");
 const catSlimeImage = catSlime?.matches("img") ? catSlime : catSlime?.querySelector(".slime-body");
+const catSlimeAssetVersion = "20260708";
+
+function catSlimeAsset(src) {
+  return `${src}?v=${catSlimeAssetVersion}`;
+}
 const timeline = document.querySelector("#timeline");
 const achievementPercent = document.querySelector("#achievement-percent");
 const achievementBlocks = document.querySelector("#achievement-blocks");
@@ -123,7 +128,7 @@ function setCatSlimeImage(src) {
 }
 
 function setCatSlimeRestingImage() {
-  setCatSlimeImage("nomal.png");
+  setCatSlimeImage(catSlimeAsset("nomal.png"));
 }
 
 function scheduleCatSlimeIdleImages() {
@@ -135,11 +140,11 @@ function scheduleCatSlimeIdleImages() {
   window.clearTimeout(catSlimeSleepTimerId);
 
   catSlimeIdleTimerId = window.setTimeout(() => {
-    setCatSlimeImage("utatane1.png");
+    setCatSlimeImage(catSlimeAsset("utatane1.png"));
   }, 60000);
 
   catSlimeSleepTimerId = window.setTimeout(() => {
-    setCatSlimeImage("sleep.png");
+    setCatSlimeImage(catSlimeAsset("sleep.png"));
   }, 300000);
 }
 
@@ -173,11 +178,11 @@ function showCatSlimeHappy() {
   window.clearTimeout(catSlimeHappyTimerId);
   window.clearTimeout(catSlimeIdleTimerId);
   window.clearTimeout(catSlimeSleepTimerId);
-  setCatSlimeImage("happy.png");
+  setCatSlimeImage(catSlimeAsset("happy.png"));
 
   catSlimeHappyTimerId = window.setTimeout(() => {
     catSlimeIsHappy = false;
-    setCatSlimeImage("nomal.png");
+    setCatSlimeImage(catSlimeAsset("nomal.png"));
     scheduleCatSlimeIdleImages();
   }, 500);
 }
@@ -190,7 +195,7 @@ function watchCatSlimeSleepTime() {
   catSlimeSleepClockId = window.setInterval(() => {
     const idleMilliseconds = Date.now() - catSlimeLastInteractionAt;
     if (isCatSlimeSleepTime() && idleMilliseconds >= 300000 && !catSlimeIsHappy) {
-      setCatSlimeImage("sleep.png");
+      setCatSlimeImage(catSlimeAsset("sleep.png"));
     }
   }, 60000);
 }
