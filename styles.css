@@ -151,6 +151,13 @@ p {
   margin-top: -64px;
 }
 
+.slime-positioner {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  transform: translateY(-30px);
+}
+
 .slime-wrap {
   --slime-x: 0px;
   --slime-y: 0px;
