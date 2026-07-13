@@ -155,7 +155,7 @@ p {
   display: grid;
   place-items: center;
   width: 100%;
-  transform: translateY(-30px);
+  transform: translateY(-80px);
 }
 
 .slime-wrap {
