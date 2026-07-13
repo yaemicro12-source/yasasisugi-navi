@@ -3,6 +3,7 @@ const lostGuide = document.querySelector("#lost-guide");
 const currentTimeOutput = document.querySelector("#current-time");
 const nextReminderOutput = document.querySelector("#next-reminder");
 const navigatorMessage = document.querySelector("#navigator-message");
+const scheduleLink = document.querySelector("#schedule-link");
 const catSlime = document.querySelector(".cat-slime");
 const catSlimeImage = catSlime?.matches("img") ? catSlime : catSlime?.querySelector(".slime-body");
 const catSlimeAssetVersion = "20260708b";
@@ -1400,6 +1401,20 @@ if (lostButton && lostGuide) {
     }
 
     lostGuide.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+}
+
+if (scheduleLink) {
+  scheduleLink.addEventListener("click", (event) => {
+    if (hasGoalPlace()) {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (navigatorMessage) {
+      navigatorMessage.textContent = "まずはもくてきちを入力してね";
+    }
   });
 }
 
